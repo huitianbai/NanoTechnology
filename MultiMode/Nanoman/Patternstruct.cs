@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 namespace MultiMode.Nanoman
 {
-    class Patternstruct
+   public class Patternstruct
     {
         public List<PointF[]> patternLine;
         public List<PointF[]> patternCircle;
