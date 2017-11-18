@@ -37,12 +37,12 @@ namespace MultiMode.Nanoman
         /// </summary>
         private PointF pivotPoint, endPoint, currentPoint;
         NanoDraw nanodraw;
-        Patternstruct patternstore= new Patternstruct();
+      Patternstruct patternstore = new Patternstruct();
         // 
         public enum drawState{
-            HANDPUSH =0,
-            DRAWLINE =1,
-            DRAWCIRCLE =2,
+            HANDPUSH = 0,
+            DRAWLINE = 1,
+            DRAWCIRCLE = 2,
             DRAWARC = 3,
             DRAWCOUNT
         }
@@ -56,6 +56,8 @@ namespace MultiMode.Nanoman
 
             ///初始化保存路径的参数和路径
             SavePath.Initial();
+            mouseSelectMode = drawState.DRAWCOUNT;
+
 
             ///如果在其他文件中已经打开图像，则直接打开该图像
             if (ModeSelect.AFMPicturePath != null)
@@ -245,10 +247,9 @@ namespace MultiMode.Nanoman
 
         private void showPictureBox_MouseDown(object sender, MouseEventArgs e)
         {
-
-            if (mouseSelectMode == drawState.HANDPUSH)
+            if (e.Button == MouseButtons.Left)//鼠标左击完成取点操作
             {
-                if (e.Button == MouseButtons.Left)//鼠标左击完成取点操作
+                if (mouseSelectMode == drawState.HANDPUSH)
                 {
                     if (number == 1)
                         pivotPoint = new PointF(e.X, e.Y);
@@ -271,42 +272,49 @@ namespace MultiMode.Nanoman
                     if (number < 0)
                         number = 1;
                 }
-            }
-            else if (mouseSelectMode == drawState.DRAWLINE)
-            {
-                if (number == 1)
-                    pivotPoint = new PointF(e.X, e.Y);
-                else if (number == 0) {
-                    endPoint = new PointF(e.X, e.Y);
-                    patternstore.patternLine.Add(new PointF[2] { pivotPoint, endPoint });
-                    showPictureBox.BackgroundImage = imageShow.ResizeImage(RefreshFigure.BackgroundImageRefresh(colorImage),
-                            showPictureBox.Width, showPictureBox.Width * _numberOfLines / _sampsInLine);
-                    colorImage = gToC.PGrayToColor(greyImage, pictureType);
-                }
-                number -= 1;
-                if (number < 0)
-                    number = 1;
-            }
-            else if (mouseSelectMode == drawState.DRAWCIRCLE)
-            {
-                if (number == 1)
-                    pivotPoint = new PointF(e.X, e.Y);
-                else if (number == 0)
+                else if (mouseSelectMode == drawState.DRAWLINE)
                 {
-                    endPoint = new PointF(e.X, e.Y);
-                    patternstore.patternCircle.Add(new PointF[2] { pivotPoint, endPoint });
-                    showPictureBox.BackgroundImage = imageShow.ResizeImage(RefreshFigure.BackgroundImageRefresh(colorImage),
-                            showPictureBox.Width, showPictureBox.Width * _numberOfLines / _sampsInLine);
-                    colorImage = gToC.PGrayToColor(greyImage, pictureType);
+                    if (number == 1)
+                        pivotPoint = new PointF(e.X, e.Y);
+                    else if (number == 0)
+                    {
+                        endPoint = new PointF(e.X, e.Y);
+                        //NanoDraw.add_line_path(pivotPoint,endPoint);
+                        patternstore.patternLine.Add(new PointF[2] { new PointF((float)(pivotPoint.X / showPictureBox.Width * PushByHand._sampsInLine) , (float)(pivotPoint.Y / showPictureBox.Height * PushByHand._numberOfLines)),
+                            new PointF((float)(endPoint.X / showPictureBox.Width * PushByHand._sampsInLine) , (float)(endPoint.Y / showPictureBox.Height * PushByHand._numberOfLines))});
+
+                        showPictureBox.BackgroundImage = imageShow.ResizeImage(RefreshFigure.BackgroundImageRefresh(colorImage, (int) mouseSelectMode, patternstore.patternLine),
+                                showPictureBox.Width, showPictureBox.Width * _numberOfLines / _sampsInLine);
+                        colorImage = gToC.PGrayToColor(greyImage, pictureType);
+
+                    }
+                    number -= 1;
+                    if (number < 0)
+                        number = 1;
                 }
-                number -= 1;
-                if (number < 0)
-                    number = 1;
+                else if (mouseSelectMode == drawState.DRAWCIRCLE)
+                {
+                    if (number == 1)
+                        pivotPoint = new PointF(e.X, e.Y);
+                    else if (number == 0)
+                    {
+                        endPoint = new PointF(e.X, e.Y);
+                        patternstore.patternCircle.Add(new PointF[2] { new PointF((float)(pivotPoint.X / showPictureBox.Width * PushByHand._sampsInLine) , (float)(pivotPoint.Y / showPictureBox.Height * PushByHand._numberOfLines)),
+                            new PointF((float)(endPoint.X / showPictureBox.Width * PushByHand._sampsInLine) , (float)(endPoint.Y / showPictureBox.Height * PushByHand._numberOfLines))});
+                        showPictureBox.BackgroundImage = imageShow.ResizeImage(RefreshFigure.BackgroundImageRefresh(colorImage, (int)mouseSelectMode, patternstore.patternCircle),
+                                showPictureBox.Width, showPictureBox.Width * _numberOfLines / _sampsInLine);
+                        colorImage = gToC.PGrayToColor(greyImage, pictureType);
+                    }
+                    number -= 1;
+                    if (number < 0)
+                        number = 1;
+                }
+                else if (mouseSelectMode == drawState.DRAWARC)
+                {
+
+                }
             }
-            else if (mouseSelectMode == drawState.DRAWARC)
-            {
-              
-            }
+            
 
         }
 
@@ -330,6 +338,7 @@ namespace MultiMode.Nanoman
 
         private void nanodrawToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //showPictureBox.ContextMenu = null; 
             nanodraw = new NanoDraw();
             nanodraw.Show();
         }
@@ -361,16 +370,16 @@ namespace MultiMode.Nanoman
             }
             else if (mouseSelectMode == drawState.DRAWARC)
             {
-                if (currentPoint != pivotPoint)//一定要在新点和旋转中心不等时候操作
-                {
-                    e.Graphics.DrawLine(p, pivotPoint.X, pivotPoint.Y, currentPoint.X, currentPoint.Y);//画选定的纳米线长度的白色线
-                }
+                //if (currentPoint != pivotPoint)//一定要在新点和旋转中心不等时候操作
+                //{
+                //    e.Graphics.DrawLine(p, pivotPoint.X, pivotPoint.Y, currentPoint.X, currentPoint.Y);//画选定的纳米线长度的白色线
+                //}
             }
             else if (mouseSelectMode == drawState.DRAWCIRCLE)
             {
                 if (currentPoint != pivotPoint)//一定要在新点和旋转中心不等时候操作
                 {
-                    float radius = (float)MathCalculate.GetDistance(pivotPoint, endPoint);
+                    float radius = (float)MathCalculate.GetDistance(pivotPoint, currentPoint);
 
                     e.Graphics.DrawEllipse(p, pivotPoint.X - radius, pivotPoint.Y - radius, radius * 2, radius * 2);//画圆
                 }
@@ -388,7 +397,7 @@ namespace MultiMode.Nanoman
             isAddPathState = true;
             addPathToolStripMenuItem.Enabled = false;
             exitToolStripMenuItem.Enabled = true;
-
+            mouseSelectMode = drawState.HANDPUSH;
         }
 
         /// <summary>
@@ -404,6 +413,7 @@ namespace MultiMode.Nanoman
             exitToolStripMenuItem.Enabled = false;
             isAddPathState = false;
             number = 1;
+            mouseSelectMode = drawState.DRAWCOUNT;
         }
 
         /// <summary>

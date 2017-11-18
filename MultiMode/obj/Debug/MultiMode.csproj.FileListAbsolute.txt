@@ -35,3 +35,22 @@ E:\Nanotechnology\MultiMode\obj\Debug\MultiMode.Properties.Resources.resources
 E:\Nanotechnology\MultiMode\obj\Debug\MultiMode.csproj.GenerateResource.Cache
 E:\Nanotechnology\MultiMode\obj\Debug\MultiMode.exe
 E:\Nanotechnology\MultiMode\obj\Debug\MultiMode.pdb
+E:\C# project\NanoTechnology\MultiMode\bin\Debug\MultiMode.exe.config
+E:\C# project\NanoTechnology\MultiMode\bin\Debug\MultiMode.exe
+E:\C# project\NanoTechnology\MultiMode\bin\Debug\MultiMode.pdb
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.csprojResolveAssemblyReference.cache
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.Nanodraw.NanoDraw.resources
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.Nanomanipulation.AutoDetect.resources
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.Nanomanipulation.BendTimes.resources
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.Nanomanipulation.ChangeWireProperties.resources
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.Nanomanipulation.PathParameter.resources
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.Nanomanipulation.PictureMode.resources
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.Nanomanipulation.SobelThreshold.resources
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.Nanomanipulation.SoftOrStiff.resources
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.ModeSelect.resources
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.Nanoman.PathParameter.resources
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.Nanoman.PushByHand.resources
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.Properties.Resources.resources
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.csproj.GenerateResource.Cache
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.exe
+E:\C# project\NanoTechnology\MultiMode\obj\Debug\MultiMode.pdb
