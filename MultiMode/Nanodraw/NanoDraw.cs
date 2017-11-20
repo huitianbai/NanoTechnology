@@ -133,28 +133,55 @@ namespace MultiMode.Nanodraw
 
         private void Generate_Click(object sender, EventArgs e)
         {
+            List<PointF> datalist = new List<PointF>();
             if (patterndata.patternArc.Count > 0)
             {
                 foreach (PointF[] t in patterndata.patternLine)
                 {
-                    List<PointF> datalist =new List<PointF>(); 
+                    
                     double length = MathCalculate.GetDistance(t[0], t[1]);
                     double angle = MathCalculate.GetAngleWithDirection(t[0], t[1]);
                     const double RULE = 0.020;
                     double density = RULE/(PushByHand._xSize/ PushByHand._sampsInLine);
-                    for (double i =0; i < length; i++)
+                    double sinangle = Math.Sin(angle);
+                    double cosangle = Math.Cos(angle);
+                    for (double i =0; i < length; )
                     {
                         PointF temp1 = new PointF((float)i, (float)i+(float)linewidthes/2);
+                        double XT = temp1.X * cosangle - temp1.Y * sinangle + t[0].X;
+                        double YT = temp1.X * sinangle + temp1.Y * cosangle + t[0].Y;
+                        temp1.X = (float)XT;
+                        temp1.Y = (float)YT;
                         PointF temp2 = new PointF((float)i, (float)i - (float)linewidthes / 2);
+                        XT = temp2.X * cosangle - temp2.Y * sinangle + t[0].X;
+                        YT = temp2.X * sinangle + temp2.Y * cosangle + t[0].Y;
+                        temp2.X = (float)XT;
+                        temp2.Y = (float)YT;
                         datalist.Add(temp1);
                         datalist.Add(temp2);
-                        i = i + density;
+                        i = i + density;                        
                     }
                     
                 }
             }
-            if (patterndata.patternLine.Count > 0)
+            if (patterndata.patternCircle.Count > 0)
             {
+                foreach (PointF[] t in patterndata.patternCircle)
+                {
+                    double radius =Math.Sqrt( (t[0].X - t[1].X) * (t[0].X - t[1].X) + (t[0].Y - t[1].Y) * (t[0].Y - t[1].Y));
+                    for (double i = 0; i < Math.PI;)
+                    {
+                        float XT = (float)Math.Cos(i) * (float)(radius + linewidthes / 2) + t[0].X;
+                        float YT = (float)Math.Sin(i) * (float)(radius + linewidthes / 2) + t[0].Y;
+                        PointF temp1 = new PointF(XT, YT );
+                        XT = (float)Math.Cos(i) * (float)(radius - linewidthes / 2) + t[0].X;
+                        YT = (float)Math.Sin(i) * (float)(radius - linewidthes / 2) + t[0].Y;
+                        PointF temp2 = new PointF(XT, YT); ;
+                        i += (Math.PI / 360);
+                        datalist.Add(temp1);
+                        datalist.Add(temp2);
+                    }
+                }
             }
             if (patterndata.patternCircle.Count > 0)
             {
