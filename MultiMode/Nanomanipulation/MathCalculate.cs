@@ -466,6 +466,18 @@ namespace MultiMode.Nanomanipulation
                 return -GetAngle(p1, m, p2);
         }
 
+        public static double GetAngleWithDirection(PointF m, PointF p2)
+        {
+            PointF p1 = new PointF(m.X + 1, m.Y);
+            PointF vector1 = new PointF(p1.X - m.X, p1.Y - m.Y);
+            PointF vector2 = new PointF(p2.X - m.X, p2.Y - m.Y);
+            double a = vector1.X * vector2.Y - vector2.X * vector1.Y;
+            if (a > 0)
+                return GetAngle(p1, m, p2);
+            else
+                return -GetAngle(p1, m, p2);
+        }
+
         /// <summary>
         /// 获得经过向量变换后点的坐标
         /// </summary>

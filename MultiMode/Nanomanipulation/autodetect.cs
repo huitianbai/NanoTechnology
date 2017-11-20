@@ -60,6 +60,9 @@ namespace MultiMode.Nanomanipulation
         public AutoDetect()
         {
             InitializeComponent();
+
+            SizeArrange();
+
             pictureType = "Iron";//在开启软件时显示图像的模式为铁红
             _edgeThreshold = 100;//在开启软件时边缘识别的阈值为100
             softOrStiff = 5;//开启软件时判断纳米线为软硬的长径比阈值为5
@@ -86,51 +89,67 @@ namespace MultiMode.Nanomanipulation
                 greyImage = imageShow.Imshow(_dataArr, _minValue, _maxValue);//从原始图像数据计算灰度图像
                 _xSize = imDataEx.scanSize;//图像x轴方向大小
                 _ySize = imDataEx.scanSize * (double)imDataEx.numberOfLines / (double)imDataEx.sampsInLine;//图像y方向大小
-                RenewPicture();//刷新picturebox中显示的图像
-                detectPanel.Enabled = true;//禁用detectPanel
-                planPanel.Enabled = true;//禁用planPanel   
-                pictureToolStripMenuItem.Enabled = true;
+                RenewPicture();//刷新picturebox中显示的图像  
+                currentFigureToolStripMenuItem.Enabled = true;
             }
             else
             {
-                detectPanel.Enabled = false;//禁用detectPanel
-                planPanel.Enabled = false;//禁用planPanel
-                pictureToolStripMenuItem.Enabled = false;
+                currentFigureToolStripMenuItem.Enabled = false;
+                planPanel.Enabled = false;
             }
 
         }
 
- 
+        /// <summary>
+        /// 设置各个控件位置和尺寸
+        /// </summary>
+        private void SizeArrange()
+        {
+            picturePanel.Location = new Point(20, 50);
+            picturePanel.Size = new Size(500, 500);
+
+            picturePanel1.Location = new Point(550, 50);
+            picturePanel1.Size = new Size(500, 500);
+
+            Ymax.Location = new Point(525, 50);
+            Y0.Location = new Point(525, 298);
+            Ymin.Location = new Point(525, 496);
+
+            MXmin.Location = new Point(550, 550);
+            MXmax.Location = new Point(1035, 550);
+            MX0.Location = new Point(790, 550);
+
+            planPanel.Location = new Point(1060, 50);
+        }
 
         /// <summary>
         /// 初始化函数
         /// </summary>
         private void Initial()
         {
-            detectPanel.Enabled = true;//使能detectPanel
             planPanel.Enabled = true;//使能planPannel
-            NanowiresList.Items.Clear();//清空list内显示内容
+            nanowiresList.Items.Clear();//清空list内显示内容
             newPoints = null;//鼠标取点内容清空
             _getPointMode = 0;//取点模式设置为0，即不做任何事
             allWires = new List<Nanowires>(0);//纳米线信息清空
             _readyToMove = false;//取消准备移动
             _getshowPictureBoxDistance = false;//清选取距离标志
-            deleteLast.Enabled = false;//删除上一个菜单禁用
-            deleteAll.Enabled = false;//删除全部菜单禁用
-            ready.Enabled = false;//准备完毕菜单禁用
-            exit.Enabled = false;//退出菜单禁用
+            reselectLastPoint.Enabled = false;//删除上一个菜单禁用
+            reselect.Enabled = false;//删除全部菜单禁用
+            apply.Enabled = false;//准备完毕菜单禁用
+            abandon.Enabled = false;//退出菜单禁用
             identify.Enabled = true;//识别按钮使能
             addNewLine.Enabled = true;//添加新的纳米线按钮使能
             deleteButton.Enabled = true;//删除按钮使能
-            readyToMove.Enabled = false;//准备移动按钮禁用
             compute.Enabled = false;//计算按钮禁用
             setTarget.Enabled = false;//确定目标位置按钮禁用
             clearShowPicBox.Enabled = false; //clearShowPicBox上下文菜单禁用
-            NanowiresList.SelectionMode = SelectionMode.MultiExtended;//NanowiresList选择模式为多选
+            nanowiresList.SelectionMode = SelectionMode.MultiExtended;//NanowiresList选择模式为多选
             orderTextBox.Text = null;//清空顺序文本内容
-            displayToolStripMenuItem.Enabled = false;//动态显示右键菜单禁用
+            simulateToolStripMenuItem.Enabled = false;//动态显示右键菜单禁用
             displayPictureBox.Visible = false;
-            pictureToolStripMenuItem.Enabled = true;
+            currentFigureToolStripMenuItem.Enabled = true;
+            planPanel.Enabled = true;
         }
 
         /// <summary>
@@ -188,7 +207,11 @@ namespace MultiMode.Nanomanipulation
         /// </summary>
         private void RenewPicture()
         {
-            ///////////////////设置PictureBox的大小，宽度为500像素固定值
+            //picturePanel.Width = 500;
+            //picturePanel.Height = 500;
+            //picturePanel1.Width = 500;
+            //picturePanel1.Height = 500;
+            ///////////////////设置PictureBox的大小，宽度为650像素固定值
             showPictureBox.Size = new Size(picturePanel.Width, picturePanel.Width / (_sampsInLine / _numberOfLines));
             showPictureBox.Location= new Point (0, picturePanel.Height / 2 - (int)(picturePanel.Width / (_sampsInLine / _numberOfLines) / 2));
             movePictureBox.Size = new Size(picturePanel.Width, picturePanel.Width / (_sampsInLine / _numberOfLines));
@@ -197,8 +220,6 @@ namespace MultiMode.Nanomanipulation
             showPictureBox.BackgroundImage = imageShow.ResizeImage(colorImage, movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);
             movePictureBox.Image = colorImage;
             ////////////////////坐标轴信息标注////////////////////////
-            SXmax.Text = Convert.ToString(_xSize / 2);
-            SXmin.Text = "-" + Convert.ToString(_xSize / 2);
             MXmax.Text = Convert.ToString(_xSize / 2);
             MXmin.Text = "-" + Convert.ToString(_xSize / 2);
             Ymax.Text = Convert.ToString(_ySize / 2);
@@ -215,25 +236,7 @@ namespace MultiMode.Nanomanipulation
         /// <param name="e"></param>
         private void picureToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PictureMode pictureForm = new PictureMode();
-            pictureForm.textFill(pictureType);
-            pictureForm.ShowDialog();
-            if(pictureForm.refresh)
-            {
-                RenewPicture();//刷新图像
-            }
-            pictureForm.Dispose();
-     
-            if (_readyToMove)//如果已经可以移动，开始选定位置
-            {
-                movePictureBox.Image = null;//清空movePictureBox的图像
-                movePictureBox.BackgroundImage = imageShow.ResizeImage(imageShow.ShowSamples(allWires, greyImage, _numberOfLines),
-                    movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);//设置movePictureBox的背景图像，因为Image需要用来选择纳米线的最终位置
-            }
-            else //未选定位置，只进行识别步骤或未进行任何步骤
-            {
-                movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines);
-            }
+            
         }
 
         /// <summary>
@@ -288,14 +291,6 @@ namespace MultiMode.Nanomanipulation
             movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines);//显示识别结果
 
             RefreshNanowiresList(listOfWires.GetMessage(allWires));//NanowireList刷新
-            readyToMove.Enabled = true;//readyToMove 按钮使能，表明此时准备移动
-            setTarget.Enabled = false;//每次识别过后 setTarget不使能，必须在按下readyToMove按钮后才可以对指定纳米线选定目标位置
-            NanowiresList.SelectionMode = SelectionMode.MultiExtended;//此时NanowiresList可以进行多项，方便删除
-            //pB.Value = 100;
-            compute.Enabled = false;//规划按钮禁用
-            _readyToMove = false;
-            orderTextBox.Text = null;//清空顺序文本内容
-            displayToolStripMenuItem.Enabled = false;//动态显示右键菜单禁用
         }
 
         /// <summary>
@@ -307,6 +302,7 @@ namespace MultiMode.Nanomanipulation
         private void sobelToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SobelThreshold edgeForm = new SobelThreshold();//新建边缘识别对话框
+            edgeForm.StartPosition = FormStartPosition.CenterParent;
             edgeForm.trackBar.Value = (int)_edgeThreshold;
             edgeForm.tvalue.Text = Convert.ToString(_edgeThreshold);
             edgeForm.tvalue.ReadOnly = true;
@@ -326,15 +322,10 @@ namespace MultiMode.Nanomanipulation
         /// <param name="e"></param>
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            showPictureBox.Image = null;//清空showPictureBox内的图像
-            showPictureBox.BackgroundImage = null;//清空showPictureBox内的背景图像
-            movePictureBox.Image = null;//清空movePictureBox内的图像
-            movePictureBox.BackgroundImage = null;//清空movePictureBox内的背景图像
-            Initial();//初始化
-            detectPanel.Enabled = false;//禁用detectPanel
-            planPanel.Enabled = false;//禁用planPanel
-            pictureToolStripMenuItem.Enabled = false;
-            ModeSelect.AFMPicturePath = null;
+            if (MessageBox.Show("Sure to exit?", "Tips", MessageBoxButtons.OKCancel) == DialogResult.OK)
+            {
+                this.Dispose();
+            }
         }
 
         /// <summary>
@@ -343,10 +334,10 @@ namespace MultiMode.Nanomanipulation
         /// <param name="list"></param>
         private void RefreshNanowiresList(List<string> list)
         {
-            NanowiresList.Items.Clear();//先清空
+            nanowiresList.Items.Clear();//先清空
             //再逐条添加
             for (int i=0;i<list.Count;i++)
-                NanowiresList.Items.Add(list[i]);
+                nanowiresList.Items.Add(list[i]);
         }
 
         /// <summary>
@@ -383,10 +374,10 @@ namespace MultiMode.Nanomanipulation
                 {
                     if (numberOfSegments >= 0)
                     {
-                        if (deleteLast.Enabled == false)//鼠标点下证明有取点，如果deleteLast菜单选项未被激活则激活deleteLast和deleteAll菜单选项
+                        if (reselectLastPoint.Enabled == false)//鼠标点下证明有取点，如果deleteLast菜单选项未被激活则激活deleteLast和deleteAll菜单选项
                         {
-                            deleteLast.Enabled = true;
-                            deleteAll.Enabled = true;
+                            reselectLastPoint.Enabled = true;
+                            reselect.Enabled = true;
                         }
                         numberOfSegments -= 1;//需要继续取点的个数减1
                         //currentPoint = new Point(e.X, e.Y);//刷新当前保存点的位置
@@ -394,7 +385,7 @@ namespace MultiMode.Nanomanipulation
                         newPoints = MatrixOperations.Appendix(newPoints, currentPoint);//添加新的点
                         movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines, newPoints);//刷新图像显示
                         if (numberOfSegments < 0)//选取全部点后激活ready菜单选项
-                            ready.Enabled = true;
+                            apply.Enabled = true;
                     }
                 }
             }
@@ -404,10 +395,10 @@ namespace MultiMode.Nanomanipulation
                 {
                     if (numberOfSegments >= 0)
                     {
-                        if (deleteLast.Enabled == false)
+                        if (reselectLastPoint.Enabled == false)
                         {
-                            deleteLast.Enabled = true;
-                            deleteAll.Enabled = true;
+                            reselectLastPoint.Enabled = true;
+                            reselect.Enabled = true;
                         }
                         currentPoint = new Point(e.X, e.Y);
                         //第一个点为鼠标点击的落下点，第二个点需要计算
@@ -417,13 +408,13 @@ namespace MultiMode.Nanomanipulation
                         }
                         else
                         {
-                            double l =allWires[NanowiresList.SelectedIndex].length* _sampsInLine/ _xSize / 1000;
+                            double l =allWires[nanowiresList.SelectedIndex].length* _sampsInLine/ _xSize / 1000;
                             PointF another = MathCalculate.GetPointToShow(newPoints[0].X, newPoints[0].Y, l, currentPoint, (double)movePictureBox.Width / (double)_sampsInLine);
                             newPoints = MatrixOperations.Appendix(newPoints, another);
                         }
                         numberOfSegments -= 1;
                         if (numberOfSegments < 0)
-                            ready.Enabled = true;
+                            apply.Enabled = true;
                     }
                 }
             }
@@ -456,23 +447,14 @@ namespace MultiMode.Nanomanipulation
         {
             numberOfSegments = 0;
             BendTimes form = new BendTimes();//获取所要新添加纳米线的线段个数
+            form .StartPosition = FormStartPosition.CenterParent;//居中显示
             form.ShowDialog();//打开添加新纳米线对话框
             if (form.value > 0)
             {
                 numberOfSegments = form.value;//确定需要添加的段数
                 staticNumber = form.value;//这个参数赋值过后不会改变，用于后续的比较
                 _getPointMode = 1;//鼠标取点模式设置为1，即选取新纳米线的模式
-                addNewLine.Enabled = false;//添加按钮禁用
-                identify.Enabled = false;//识别按钮禁用
-                deleteButton.Enabled = false;//删除按钮禁用
-                exit.Enabled = true;//突出取点菜单激活
-                readyToMove.Enabled = false;//准备移动按钮禁用
-                setTarget.Enabled = false;//设置纳米线目标位置禁用
-                _readyToMove = false;//清准备移动标志
-                compute.Enabled = false;//规划按钮禁用
-                NanowiresList.SelectionMode = SelectionMode.MultiExtended;//NanowiresList列表选择模式设置为多选
-                orderTextBox.Text = null;//清空顺序文本内容
-                displayToolStripMenuItem.Enabled = false;//动态显示右键菜单禁用
+                abandon.Enabled = true;
             }
             form.Dispose();//清除form，释放内存   
         }
@@ -484,10 +466,10 @@ namespace MultiMode.Nanomanipulation
         /// <param name="e"></param>
         private void softStiffThresholdToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SoftOrStiff change = new SoftOrStiff(softOrStiff);
-
-            change.ShowDialog();
-            change.Dispose();
+            SoftOrStiff form = new SoftOrStiff(softOrStiff);
+            form.StartPosition = FormStartPosition.CenterParent;
+            form.ShowDialog();
+            form.Dispose();
             listOfWires.RefreshWires(allWires);//刷新全部纳米线的信息
             RefreshNanowiresList(listOfWires.GetMessage(allWires));//刷新NanowiresList显示内容
         }
@@ -499,23 +481,17 @@ namespace MultiMode.Nanomanipulation
         /// <param name="e"></param>
         private void deleteButton_Click(object sender, EventArgs e)
         {
-            if (NanowiresList.SelectedIndices.Count > 0)
+            if (nanowiresList.SelectedIndices.Count > 0)
             {
-                int l = NanowiresList.SelectedIndices.Count;
+                int l = nanowiresList.SelectedIndices.Count;
                 int[] indexOfItems = new int[l];
 
                 for (int i = 0; i < l; i++)//获取被选中删除的纳米线索引
-                    indexOfItems[i] = NanowiresList.SelectedIndices[i];
+                    indexOfItems[i] = nanowiresList.SelectedIndices[i];
 
                 listOfWires.Delete(allWires, indexOfItems);//删除选中的纳米线
                 RefreshNanowiresList(listOfWires.GetMessage(allWires));//刷新NanowiresList显示的内容
                 movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines);//刷新movePictureBox显示的图像
-                setTarget.Enabled = false;//确定目标位置按钮禁用,此时需要点击readyToMove按钮激活
-                _readyToMove = false;//由于新添加了样条，所以需要重新准备
-                compute.Enabled = false;//规划按钮禁用
-                NanowiresList.SelectionMode = SelectionMode.MultiExtended;//NanowiresList选择模式为多选
-                orderTextBox.Text = null;//清空顺序文本内容
-                displayToolStripMenuItem.Enabled = false;//动态显示右键菜单禁用
             }  
         }
 
@@ -528,14 +504,14 @@ namespace MultiMode.Nanomanipulation
         {
             newPoints = MatrixOperations.CutLast(newPoints);//减掉上一个选取的点
             numberOfSegments += 1;//需要选取的点的个数加一
-            ready.Enabled = false;//ready菜单选项禁用
+            apply.Enabled = false;//ready菜单选项禁用
             if (_getPointMode == 1)//添加新样条模式
             {
                 movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines, newPoints);//刷新图像显示
                 if (numberOfSegments == staticNumber)//如果不能继续删除点了，则deleteAll,deleteLast菜单选项禁用
                 {
-                    deleteAll.Enabled = false;
-                    deleteLast.Enabled = false;
+                    reselect.Enabled = false;
+                    reselectLastPoint.Enabled = false;
                 }
             }
             else if (_getPointMode == 2)//确定目标位置模式
@@ -543,8 +519,8 @@ namespace MultiMode.Nanomanipulation
                 if (numberOfSegments == 1)//不能继续删除了
                 {
                     movePictureBox.Image = null;//清空图像显示
-                    deleteAll.Enabled = false;
-                    deleteLast.Enabled = false;
+                    reselect.Enabled = false;
+                    reselectLastPoint.Enabled = false;
                 }
             }
             
@@ -562,33 +538,30 @@ namespace MultiMode.Nanomanipulation
                 addNewLine.Enabled = true;//添加纳米线按钮使能
                 identify.Enabled = true;
                 deleteButton.Enabled = true;
-                ready.Enabled = false;//ready菜单不使能
-                exit.Enabled = false;//exit菜单不使能
-                deleteLast.Enabled = false;//deleteLast菜单不使能
-                deleteAll.Enabled = false;//deleteAll菜单不使能
+                apply.Enabled = false;//ready菜单不使能
+                abandon.Enabled = false;//exit菜单不使能
+                reselectLastPoint.Enabled = false;//deleteLast菜单不使能
+                reselect.Enabled = false;//deleteAll菜单不使能
                 _getPointMode = 0;
                 Nanowires newWire = new Nanowires(_dataArr, newPoints, _sampsInLine, _xSize);//添加新的纳米线信息
                 newPoints = null;
                 allWires.Add(newWire);//加入allWires列表
                 RefreshNanowiresList(listOfWires.GetMessage(allWires));//刷新list显示
-                readyToMove.Enabled = true;
             }
             else if (_getPointMode == 2)
             {
-                detectPanel.Enabled = true;
-                ready.Enabled = false;//ready菜单不使能
-                exit.Enabled = false;//exit菜单不使能
-                deleteLast.Enabled = false;//deleteLast菜单不使能
-                deleteAll.Enabled = false;//deleteAll菜单不使能
+                apply.Enabled = false;//ready菜单不使能
+                abandon.Enabled = false;//exit菜单不使能
+                reselectLastPoint.Enabled = false;//deleteLast菜单不使能
+                reselect.Enabled = false;//deleteAll菜单不使能
                 _getPointMode = 0;
                 //给对应的纳米线设置目标位置
-                allWires[NanowiresList.SelectedIndex].SetTarget(GetRealPoints(newPoints[0]),GetRealPoints(newPoints[1]));
+                allWires[nanowiresList.SelectedIndex].SetTarget(GetRealPoints(newPoints[0]),GetRealPoints(newPoints[1]));
                 //改变movePictureBox背景图像的显示
                 movePictureBox.Image = null;
                 movePictureBox.BackgroundImage = imageShow.ResizeImage(imageShow.ShowSamples(allWires, greyImage, _numberOfLines),
                     movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);
                 newPoints = null;
-                readyToMove.Enabled = true;//此时仍然可以点击readyToMove按钮，readyToMove按钮同样具有清空全部已确定目标位置的功能
                 setTarget.Enabled = false;//setTarget按钮禁用
                 bool okToRule = true;
                 foreach (Nanowires wire in allWires)
@@ -612,9 +585,9 @@ namespace MultiMode.Nanomanipulation
         /// <param name="e"></param>
         private void deleteAll_Click(object sender, EventArgs e)
         {
-            ready.Enabled = false;//ready菜单选项禁用
-            deleteLast.Enabled = false;//deleteLast菜单选项禁用
-            deleteAll.Enabled = false;//deleteAll菜单选项禁用
+            apply.Enabled = false;//ready菜单选项禁用
+            reselectLastPoint.Enabled = false;//deleteLast菜单选项禁用
+            reselect.Enabled = false;//deleteAll菜单选项禁用
             newPoints = null;
             if (_getPointMode == 1)
             {
@@ -638,7 +611,7 @@ namespace MultiMode.Nanomanipulation
         {
             if (e.Button == MouseButtons.Right)
             {
-                if (NanowiresList.SelectedIndices.Count != 1)//没有选取任何点的时候全部singleWireMove菜单禁用
+                if (nanowiresList.SelectedIndices.Count != 1)//没有选取任何点的时候全部singleWireMove菜单禁用
                     singleWireMove.Enabled = false;
                 else 
                     singleWireMove.Enabled = true;
@@ -653,65 +626,19 @@ namespace MultiMode.Nanomanipulation
         private void propertiesMenu(object sender, EventArgs e)
         {
             ChangeWireProperties form = new ChangeWireProperties();
-            form.Initial(NanowiresList.SelectedIndices[0]);
+            form.StartPosition = FormStartPosition.CenterParent;
+            form.Initial(nanowiresList.SelectedIndices[0]);
             form.ShowDialog();
             if (form.refresh)//对选中纳米线的信息进行更新
             {
-                allWires[NanowiresList.SelectedIndices[0]].diameter = Convert.ToDouble(form.textBox.Text);//更新直径
-                allWires[NanowiresList.SelectedIndices[0]].softOrStiff = form.SoftOrStiff.Text;//更新soft或stiff性质
-                allWires[NanowiresList.SelectedIndices[0]].GetDivision();//重新计算长径比
-                allWires[NanowiresList.SelectedIndices[0]].SetRotatingPointPosition(Convert.ToDouble(form.rotationPivot.Text));
+                allWires[nanowiresList.SelectedIndices[0]].diameter = Convert.ToDouble(form.textBox.Text);//更新直径
+                allWires[nanowiresList.SelectedIndices[0]].softOrStiff = form.SoftOrStiff.Text;//更新soft或stiff性质
+                allWires[nanowiresList.SelectedIndices[0]].GetDivision();//重新计算长径比
+                allWires[nanowiresList.SelectedIndices[0]].SetRotatingPointPosition(Convert.ToDouble(form.rotationPivot.Text));
                 RefreshNanowiresList(listOfWires.GetMessage(allWires));//刷新NanowiresList显示内容
             }
             form.Dispose();//form删除，释放内存
         }
-
-        /// <summary>
-        /// readyToMove按钮按下函数，调直纳米线，重新绘图
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void readyToMove_Click(object sender, EventArgs e)
-        {
-            bool bendWireFound = false;//表示是否发现有弯折的纳米线
-            foreach (Nanowires wire in allWires)
-            {
-                wire.ClearTarget();//清除已经有目标位置纳米线的目标位置
-                //设置每个纳米线调直后的初始位置
-                if (wire.points.GetLength(0) == 2)//初始状态为直线
-                {
-                    wire.SetStart();
-                }
-                else if (wire.points.GetLength(0) == 3)//初始状态为一次弯折
-                {
-                    bendWireFound = true;
-                    double[] result = new double[4];
-                    result = MathCalculate.GetStraight(wire.points[0], wire.points[1], wire.points[2], allWires.IndexOf(wire));
-                    wire.SetStart(result);
-                }
-                else if (wire.points.GetLength(0) == 4)//初始状态为两次弯折
-                {
-                    bendWireFound = true;
-                    double[] result = new double[4];
-                    result = MathCalculate.GetStraight(wire.points[0], wire.points[1], wire.points[2], wire.points[3], allWires.IndexOf(wire));
-                    wire.SetStart(result);
-                }//至多只有两次弯折
-            }
-            movePictureBox.Image = null;//清空movePictureBox的图像
-            movePictureBox.BackgroundImage = imageShow.ResizeImage(imageShow.ShowSamples(allWires, greyImage, _numberOfLines), 
-                movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);//设置movePictureBox的背景图像，因为Image需要用来选择纳米线的最终位置
-            if (bendWireFound)
-                MessageBox.Show("Bent wires are found!");//如果发现弯曲的纳米线，messagebox给出提示信息
-            else
-                MessageBox.Show("No bent wires are found!");//如果没有发现弯曲的纳米线，messagebox给出提示信息
-            _readyToMove = true;//表示全部纳米线已经调直完毕，可以准备选定位置进行移动
-            compute.Enabled = false;//规划按钮禁用
-            NanowiresList.SelectionMode = SelectionMode.One;//设置NanowiresList 的选择模式为单选，因为后续选定位置只能对单一纳米线操作
-            orderTextBox.Text = null;//清空顺序文本内容
-            displayToolStripMenuItem.Enabled = false;//动态显示右键菜单禁用
-            savePathToolStripMenuItem.Enabled = false;
-        }
-
         /// <summary>
         /// 上下文菜单 MouseGetPoint -> exit 放弃该次取样
         /// </summary>
@@ -719,11 +646,10 @@ namespace MultiMode.Nanomanipulation
         /// <param name="e"></param>
         private void exit_Click(object sender, EventArgs e)
         {
-            ready.Enabled = false;//ready菜单选项禁用
-            deleteLast.Enabled = false;//deleteLast菜单选项禁用
-            deleteAll.Enabled = false;//deleteAll菜单选项禁用
-            exit.Enabled = false;//exit菜单选项禁用
-            readyToMove.Enabled = true;//readyToMove按钮激活
+            apply.Enabled = false;//ready菜单选项禁用
+            reselectLastPoint.Enabled = false;//deleteLast菜单选项禁用
+            reselect.Enabled = false;//deleteAll菜单选项禁用
+            abandon.Enabled = false;//exit菜单选项禁用
             newPoints = null;//清空全部已经选取的点
             if (_getPointMode == 1)//取点模式为确定新纳米线
             {
@@ -735,7 +661,6 @@ namespace MultiMode.Nanomanipulation
             }
             else if (_getPointMode == 2)//取点模式为确定目标位置
             {
-                detectPanel.Enabled = true;//识别面板使能
                 setTarget.Enabled = false;//setTarget按钮使能
 
                 movePictureBox.Image = null;//清空图像显示
@@ -753,19 +678,17 @@ namespace MultiMode.Nanomanipulation
             numberOfSegments = 1;//设置获取线的段数为1，因为确定目标位置均为单一线段
 
             _getPointMode = 2;//表示目前取点的模式为选定目标位置
-            detectPanel.Enabled = false;//识别面板的全部控件不使能，这是为了保证在获取目标位置的过程中不受前面步骤的影响，尤其是addNewItem按钮
-            readyToMove.Enabled = false;//准备按钮不使能，保证确定目标的过程不受影响
-            exit.Enabled = true;//退出菜单使能，表示可以退出该次纳米线目标位置的确定
+            abandon.Enabled = true;//退出菜单使能，表示可以退出该次纳米线目标位置的确定
             compute.Enabled = false;//路径规划计算按钮禁用
 
-            allWires[NanowiresList.SelectedIndex].ClearTarget();//对于选中的纳米线清除已经确定的目标位置，因为此时点下按钮后需要对该纳米线选定新的目标位置
+            allWires[nanowiresList.SelectedIndex].ClearTarget();//对于选中的纳米线清除已经确定的目标位置，因为此时点下按钮后需要对该纳米线选定新的目标位置
             //清空前景图像Image，刷新movePictureBox的背景图像
             movePictureBox.Image = null;
             movePictureBox.BackgroundImage = imageShow.ResizeImage(imageShow.ShowSamples(allWires, greyImage, _numberOfLines),
                 movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);
 
             orderTextBox.Text = null;
-            displayContextMenuStrip.Enabled = false;
+            simulateContextMenuStrip.Enabled = false;
             
         }
 
@@ -779,7 +702,7 @@ namespace MultiMode.Nanomanipulation
             if (_getPointMode == 2 && numberOfSegments <= 0)//在取点模式为确定目标位置且已经取好一个点的情况执行
             {
                 Pen p = new Pen(Color.White, 3);
-                double l = allWires[NanowiresList.SelectedIndex].length * _sampsInLine / _xSize / 1000;
+                double l = allWires[nanowiresList.SelectedIndex].length * _sampsInLine / _xSize / 1000;
                 if (currentPoint != newPoints[0])//一定要在新点和旋转中心不等时候操作
                 {
                     PointF another = MathCalculate.GetPointToShow(newPoints[0].X, newPoints[0].Y, l, currentPoint, (double)movePictureBox.Width / (double)_sampsInLine);
@@ -866,6 +789,87 @@ namespace MultiMode.Nanomanipulation
         }
 
         /// <summary>
+        /// 标签页选择变化
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void operationMode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (operationMode.SelectedIndex == 0)
+            {
+                nanowiresList.SelectionMode = SelectionMode.MultiExtended;
+                movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines);
+            }
+            else if(operationMode.SelectedIndex == 1)
+            {
+                if (allWires.Count > 0)
+                {
+                    nanowiresList.SelectionMode = SelectionMode.One;
+                    compute.Enabled = false;//规划按钮禁用
+                    orderTextBox.Text = null;//清空顺序文本内容
+                    simulateToolStripMenuItem.Enabled = false;//动态显示右键菜单禁用
+                    exportPathToolStripMenuItem.Enabled = false;//保存路径按钮禁用
+
+                    bool bendWireFound = false;//表示是否发现有弯折的纳米线
+                    foreach (Nanowires wire in allWires)
+                    {
+                        wire.ClearTarget();//清除已经有目标位置纳米线的目标位置
+                                           //设置每个纳米线调直后的初始位置
+                        if (wire.points.GetLength(0) == 2)//初始状态为直线
+                        {
+                            wire.SetStart();
+                        }
+                        else if (wire.points.GetLength(0) == 3)//初始状态为一次弯折
+                        {
+                            bendWireFound = true;
+                            double[] result = new double[4];
+                            result = MathCalculate.GetStraight(wire.points[0], wire.points[1], wire.points[2], allWires.IndexOf(wire));
+                            wire.SetStart(result);
+                        }
+                        else if (wire.points.GetLength(0) == 4)//初始状态为两次弯折
+                        {
+                            bendWireFound = true;
+                            double[] result = new double[4];
+                            result = MathCalculate.GetStraight(wire.points[0], wire.points[1], wire.points[2], wire.points[3], allWires.IndexOf(wire));
+                            wire.SetStart(result);
+                        }//至多只有两次弯折
+                    }
+                    movePictureBox.Image = null;//清空movePictureBox的图像
+                    movePictureBox.BackgroundImage = imageShow.ResizeImage(imageShow.ShowSamples(allWires, greyImage, _numberOfLines),
+                        movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);//设置movePictureBox的背景图像，因为Image需要用来选择纳米线的最终位置
+                    if (bendWireFound)
+                        MessageBox.Show("Bent wires are found!");//如果发现弯曲的纳米线，messagebox给出提示信息
+                    else
+                        MessageBox.Show("No bent wire is found!");//如果没有发现弯曲的纳米线，messagebox给出提示信息
+                    _readyToMove = true;//表示全部纳米线已经调直完毕，可以准备选定位置进行移动     
+                } 
+            }
+        }
+
+        private void displayToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            PictureMode pictureForm = new PictureMode();
+            pictureForm.StartPosition = FormStartPosition.CenterParent;
+            pictureForm.textFill(pictureType);
+            pictureForm.ShowDialog();
+            if (pictureForm.refresh && movePictureBox.Image != null)
+            {
+                RenewPicture();//刷新图像
+                if (_readyToMove)//如果已经可以移动，开始选定位置
+                {
+                    movePictureBox.Image = null;//清空movePictureBox的图像
+                    movePictureBox.BackgroundImage = imageShow.ResizeImage(imageShow.ShowSamples(allWires, greyImage, _numberOfLines),
+                        movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);//设置movePictureBox的背景图像，因为Image需要用来选择纳米线的最终位置
+                }
+                else //未选定位置，只进行识别步骤或未进行任何步骤
+                {
+                    movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines);
+                }
+            }
+            pictureForm.Dispose();
+        }
+
+        /// <summary>
         /// 上下文菜单 clearShowPicBox -> Clear
         /// </summary>
         /// <param name="sender"></param>
@@ -883,12 +887,13 @@ namespace MultiMode.Nanomanipulation
         /// <param name="e"></param>
         private void compute_Click(object sender, EventArgs e)
         {
+            pB.Value = 0;
             order = new OrderPlanning(allWires.Count);
-            foreach (Nanowires w in allWires)
-                w.SetMiddleWire();
-
+            pB.Value = 10;
             order.GetMoveStrategy();
+            pB.Value = 90;
             FillInOrderTextBox();
+            pB.Value = 100;
         }
 
         /// <summary>
@@ -896,21 +901,20 @@ namespace MultiMode.Nanomanipulation
         /// </summary>
         private void FillInOrderTextBox()
         {
-            string s = "[ ";
+            string s = " ";
             if (order.findResult)
             {
-                displayToolStripMenuItem.Enabled = true;
+                simulateToolStripMenuItem.Enabled = true;
                 for (int i = 0; i < order.order.GetLength(0); i++)
                     s = s + Convert.ToString(order.order[i] + 1) + ' ';
-                savePathToolStripMenuItem.Enabled = true;
-                displayContextMenuStrip.Enabled = true;
+                exportPathToolStripMenuItem.Enabled = true;
+                simulateContextMenuStrip.Enabled = true;
             }
             else
             {
-                displayToolStripMenuItem.Enabled = false;
+                simulateToolStripMenuItem.Enabled = false;
                 s = s + "null ";
             }
-            s = s + ']';
             orderTextBox.Text = s;
         }
 
@@ -919,7 +923,7 @@ namespace MultiMode.Nanomanipulation
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void displayToolStripMenuItem_Click(object sender, EventArgs e)
+        private void simulateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Pen pr = new Pen(Color.Red, 3);
             Pen pb = new Pen(Color.White, 3);
@@ -1032,7 +1036,7 @@ namespace MultiMode.Nanomanipulation
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void savePathToolStripMenuItem_Click(object sender, EventArgs e)
+        private void exportPathToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SavePath.PathGenerate();
 
@@ -1100,6 +1104,7 @@ namespace MultiMode.Nanomanipulation
         private void pathToolStripMenuItem_Click(object sender, EventArgs e)
         {
             PathParameter form = new PathParameter();
+            form.StartPosition = FormStartPosition.CenterParent;
             form.SetValue();
             form.ShowDialog();
             form.Dispose();

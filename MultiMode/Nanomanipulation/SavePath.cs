@@ -17,8 +17,9 @@ namespace MultiMode.Nanomanipulation
         /// 对于任意新打开的图像是否调整过参数
         /// </summary>
         public static bool isSet;
-
+        //
         private static Nanowires.Wire startWire, targetWire;
+        //
         public static List<double> manipulationPath;
         public static List<PointF> manipulationPathForShow;
 

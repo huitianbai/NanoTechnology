@@ -51,57 +51,57 @@
     <Compile Include="Nanodraw\NanoDraw.Designer.cs">
       <DependentUpon>NanoDraw.cs</DependentUpon>
     </Compile>
-    <Compile Include="Nanomanipulation\autodetect.cs">
+    <Compile Include="Automatic manipulation\autodetect.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Nanomanipulation\autodetect.Designer.cs">
+    <Compile Include="Automatic manipulation\autodetect.Designer.cs">
       <DependentUpon>autodetect.cs</DependentUpon>
     </Compile>
-    <Compile Include="Nanomanipulation\BendTimes.cs">
+    <Compile Include="Automatic manipulation\BendTimes.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Nanomanipulation\BendTimes.Designer.cs">
+    <Compile Include="Automatic manipulation\BendTimes.Designer.cs">
       <DependentUpon>BendTimes.cs</DependentUpon>
     </Compile>
-    <Compile Include="Nanomanipulation\ChangeWireProperties.cs">
+    <Compile Include="Automatic manipulation\ChangeWireProperties.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Nanomanipulation\ChangeWireProperties.Designer.cs">
+    <Compile Include="Automatic manipulation\ChangeWireProperties.Designer.cs">
       <DependentUpon>ChangeWireProperties.cs</DependentUpon>
     </Compile>
-    <Compile Include="Nanomanipulation\DisplayImage.cs" />
-    <Compile Include="Nanomanipulation\GreyToColor.cs" />
-    <Compile Include="Nanomanipulation\ImageDataExtraction.cs" />
-    <Compile Include="Nanomanipulation\LinearFit.cs" />
-    <Compile Include="Nanomanipulation\ListMessage.cs" />
-    <Compile Include="Nanomanipulation\MathCalculate.cs" />
-    <Compile Include="Nanomanipulation\MatrixOperations.cs" />
-    <Compile Include="Nanomanipulation\MorphologyTransform.cs" />
-    <Compile Include="Nanomanipulation\Nanowires.cs" />
-    <Compile Include="Nanomanipulation\OrderPlanning.cs" />
-    <Compile Include="Nanomanipulation\PathParameter.cs">
+    <Compile Include="Automatic manipulation\DisplayImage.cs" />
+    <Compile Include="Automatic manipulation\GreyToColor.cs" />
+    <Compile Include="Automatic manipulation\ImageDataExtraction.cs" />
+    <Compile Include="Automatic manipulation\LinearFit.cs" />
+    <Compile Include="Automatic manipulation\ListMessage.cs" />
+    <Compile Include="Automatic manipulation\MathCalculate.cs" />
+    <Compile Include="Automatic manipulation\MatrixOperations.cs" />
+    <Compile Include="Automatic manipulation\MorphologyTransform.cs" />
+    <Compile Include="Automatic manipulation\Nanowires.cs" />
+    <Compile Include="Automatic manipulation\OrderPlanning.cs" />
+    <Compile Include="Automatic manipulation\PathParameter.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Nanomanipulation\PathParameter.Designer.cs">
+    <Compile Include="Automatic manipulation\PathParameter.Designer.cs">
       <DependentUpon>PathParameter.cs</DependentUpon>
     </Compile>
-    <Compile Include="Nanomanipulation\PictureMode.cs">
+    <Compile Include="Automatic manipulation\PictureMode.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Nanomanipulation\PictureMode.Designer.cs">
+    <Compile Include="Automatic manipulation\PictureMode.Designer.cs">
       <DependentUpon>PictureMode.cs</DependentUpon>
     </Compile>
-    <Compile Include="Nanomanipulation\SavePath.cs" />
-    <Compile Include="Nanomanipulation\SobelThreshold.cs">
+    <Compile Include="Automatic manipulation\SavePath.cs" />
+    <Compile Include="Automatic manipulation\SobelThreshold.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Nanomanipulation\SobelThreshold.Designer.cs">
+    <Compile Include="Automatic manipulation\SobelThreshold.Designer.cs">
       <DependentUpon>SobelThreshold.cs</DependentUpon>
     </Compile>
-    <Compile Include="Nanomanipulation\SoftOrStiff.cs">
+    <Compile Include="Automatic manipulation\SoftOrStiff.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Nanomanipulation\SoftOrStiff.Designer.cs">
+    <Compile Include="Automatic manipulation\SoftOrStiff.Designer.cs">
       <DependentUpon>SoftOrStiff.cs</DependentUpon>
     </Compile>
     <Compile Include="ModeSelect.cs">
@@ -110,54 +110,54 @@
     <Compile Include="ModeSelect.Designer.cs">
       <DependentUpon>ModeSelect.cs</DependentUpon>
     </Compile>
-    <Compile Include="Nanoman\PathParameter.cs">
+    <Compile Include="Manual cutting\PathParameter.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Nanoman\PathParameter.Designer.cs">
+    <Compile Include="Manual cutting\PathParameter.Designer.cs">
       <DependentUpon>PathParameter.cs</DependentUpon>
     </Compile>
-    <Compile Include="Nanoman\Patternstruct.cs" />
-    <Compile Include="Nanoman\PushByHand.cs">
+    <Compile Include="Manual cutting\Patternstruct.cs" />
+    <Compile Include="Manual cutting\PushByHand.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Nanoman\PushByHand.Designer.cs">
+    <Compile Include="Manual cutting\PushByHand.Designer.cs">
       <DependentUpon>PushByHand.cs</DependentUpon>
     </Compile>
-    <Compile Include="Nanoman\RefreshFigure.cs" />
-    <Compile Include="Nanoman\SavePath.cs" />
+    <Compile Include="Manual cutting\RefreshFigure.cs" />
+    <Compile Include="Manual cutting\SavePath.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Nanodraw\NanoDraw.resx">
       <DependentUpon>NanoDraw.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Nanomanipulation\autodetect.resx">
+    <EmbeddedResource Include="Automatic manipulation\autodetect.resx">
       <DependentUpon>autodetect.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Nanomanipulation\BendTimes.resx">
+    <EmbeddedResource Include="Automatic manipulation\BendTimes.resx">
       <DependentUpon>BendTimes.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Nanomanipulation\ChangeWireProperties.resx">
+    <EmbeddedResource Include="Automatic manipulation\ChangeWireProperties.resx">
       <DependentUpon>ChangeWireProperties.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Nanomanipulation\PathParameter.resx">
+    <EmbeddedResource Include="Automatic manipulation\PathParameter.resx">
       <DependentUpon>PathParameter.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Nanomanipulation\PictureMode.resx">
+    <EmbeddedResource Include="Automatic manipulation\PictureMode.resx">
       <DependentUpon>PictureMode.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Nanomanipulation\SobelThreshold.resx">
+    <EmbeddedResource Include="Automatic manipulation\SobelThreshold.resx">
       <DependentUpon>SobelThreshold.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Nanomanipulation\SoftOrStiff.resx">
+    <EmbeddedResource Include="Automatic manipulation\SoftOrStiff.resx">
       <DependentUpon>SoftOrStiff.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ModeSelect.resx">
       <DependentUpon>ModeSelect.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Nanoman\PathParameter.resx">
+    <EmbeddedResource Include="Manual cutting\PathParameter.resx">
       <DependentUpon>PathParameter.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Nanoman\PushByHand.resx">
+    <EmbeddedResource Include="Manual cutting\PushByHand.resx">
       <DependentUpon>PushByHand.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">

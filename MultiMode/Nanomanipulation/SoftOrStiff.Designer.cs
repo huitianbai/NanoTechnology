@@ -31,14 +31,16 @@
             this.Confirm = new System.Windows.Forms.Button();
             this.Cancel = new System.Windows.Forms.Button();
             this.textBox = new System.Windows.Forms.TextBox();
-            this.StillBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // Confirm
             // 
-            this.Confirm.Location = new System.Drawing.Point(30, 85);
+            this.Confirm.Location = new System.Drawing.Point(40, 205);
+            this.Confirm.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Confirm.Name = "Confirm";
-            this.Confirm.Size = new System.Drawing.Size(75, 23);
+            this.Confirm.Size = new System.Drawing.Size(100, 29);
             this.Confirm.TabIndex = 6;
             this.Confirm.Text = "Confirm";
             this.Confirm.UseVisualStyleBackColor = true;
@@ -46,9 +48,10 @@
             // 
             // Cancel
             // 
-            this.Cancel.Location = new System.Drawing.Point(121, 85);
+            this.Cancel.Location = new System.Drawing.Point(167, 205);
+            this.Cancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Cancel.Name = "Cancel";
-            this.Cancel.Size = new System.Drawing.Size(75, 23);
+            this.Cancel.Size = new System.Drawing.Size(100, 29);
             this.Cancel.TabIndex = 7;
             this.Cancel.Text = "Cancel";
             this.Cancel.UseVisualStyleBackColor = true;
@@ -56,33 +59,48 @@
             // 
             // textBox
             // 
-            this.textBox.Location = new System.Drawing.Point(137, 38);
+            this.textBox.Location = new System.Drawing.Point(218, 44);
+            this.textBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBox.Name = "textBox";
-            this.textBox.Size = new System.Drawing.Size(59, 21);
+            this.textBox.Size = new System.Drawing.Size(77, 25);
             this.textBox.TabIndex = 8;
             this.textBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.textBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox_KeyPress);
             // 
-            // StillBox
+            // label1
             // 
-            this.StillBox.BackColor = System.Drawing.SystemColors.Menu;
-            this.StillBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.StillBox.Location = new System.Drawing.Point(12, 41);
-            this.StillBox.Name = "StillBox";
-            this.StillBox.ReadOnly = true;
-            this.StillBox.Size = new System.Drawing.Size(119, 14);
-            this.StillBox.TabIndex = 9;
-            this.StillBox.Text = "Soft/Stiff Threshold";
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(25, 49);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(183, 15);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "Aspect Ratio Threshold";
+            // 
+            // textBox1
+            // 
+            this.textBox1.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.textBox1.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.Location = new System.Drawing.Point(28, 82);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
+            this.textBox1.Size = new System.Drawing.Size(267, 105);
+            this.textBox1.TabIndex = 10;
+            this.textBox1.Text = "If a nanowire\'s aspect ratio is smaller than the threshold, it\'s recognized as a " +
+    "stiff nanowire. Otherwise, it\'s recognized as a soft wire.";
             // 
             // SoftOrStiff
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(229, 120);
-            this.Controls.Add(this.StillBox);
+            this.ClientSize = new System.Drawing.Size(326, 266);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox);
             this.Controls.Add(this.Cancel);
             this.Controls.Add(this.Confirm);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.MaximizeBox = false;
             this.Name = "SoftOrStiff";
             this.Text = "SoftOrStiff";
             this.ResumeLayout(false);
@@ -95,6 +113,7 @@
         private System.Windows.Forms.Button Confirm;
         private System.Windows.Forms.Button Cancel;
         private System.Windows.Forms.TextBox textBox;
-        private System.Windows.Forms.TextBox StillBox;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }

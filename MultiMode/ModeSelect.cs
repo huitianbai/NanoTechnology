@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
-using MultiMode.Nanomanipulation;
+using MultiMode.Automanipulation;
 using MultiMode.Nanoman;
 
 namespace MultiMode
@@ -16,7 +16,7 @@ namespace MultiMode
 
         private void load_Click(object sender, EventArgs e)
         {
-            if (nanomanipulation.Checked)
+            if (automanipulation.Checked)
             {
                 AutoDetect form = new AutoDetect();
                 this.Visible = false;
@@ -25,7 +25,7 @@ namespace MultiMode
 
                 Application.Exit();
             }
-            else if (nanoman.Checked)
+            else if (manualCutting.Checked)
             {
                 PushByHand form = new PushByHand();
                 this.Visible = false;

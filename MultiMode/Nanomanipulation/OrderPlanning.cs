@@ -40,13 +40,18 @@ namespace MultiMode.Nanomanipulation
         /// <param name="length"></param>
         public OrderPlanning(int length)
         {
+            //复位中间位置
+            foreach (Nanowires w in AutoDetect.allWires)
+                w.SetMiddleWire();
+
             reachPosition = new int[length];
-            numberOfNanowires = length;
+            numberOfNanowires = length;//初始化纳米线的数目
             ResetReachPosition();//复位到达位置信息数组
             SetInitialMovedMatirx();//初始化移动矩阵
             findResult = false;//表示没有算出结果
-            order = null;
-            middleResult = new MiddlePosition();
+            order = null;//清空顺序
+            middleResult = new MiddlePosition();//中间位置信息初始化
+            pushOrderForPath = new List<PathMessage>();//生成路径信息初始化
         }
 
 
@@ -63,10 +68,15 @@ namespace MultiMode.Nanomanipulation
 
             public MiddlePosition(int[] a, Nanowires.Wire mWire, int indexOfWire, double d)
             {
-                possibleResults = new List<List<int[]>>(1) { new List<int[]>(1) { a }};
+                //possibleResults 表示新添加中间位置后全部的可能移动情况
+                possibleResults = new List<List<int[]>>(1) { new List<int[]>(1) { MatrixOperations.Appendix(a, indexOfWire) }};
+                //中间位置信息
                 middleWire = mWire;
+                //被选中中间位置纳米线的索引
                 index = indexOfWire;
+                //增加的移动距离
                 distanceAdded = d;
+                //表示已经获取中间位置
                 getValue = true;
             }
             public MiddlePosition()
@@ -81,8 +91,11 @@ namespace MultiMode.Nanomanipulation
         /// </summary>
         public class PathMessage
         {
+            //需要移动的初始位置及终止位置
             public Nanowires.Wire presentWire, targetWire;
+            //被移动的纳米线索引
             public int index;
+            //是否是旋转
             public bool isRotate;
             public PathMessage(Nanowires.Wire w1, Nanowires.Wire w2, int n, bool r)
             {
@@ -112,6 +125,7 @@ namespace MultiMode.Nanomanipulation
                 else
                     allPossibleResults.Add(a);
             }
+
             if (allPossibleResults.Count != numberOfNanowires + 1)
             {
                 SetMiddlePoints();//设置全部作为中间位置的桩点
@@ -160,13 +174,6 @@ namespace MultiMode.Nanomanipulation
             }
         }
 
-        private void PathMessageAdd(int index)
-        {
-            pushOrderForPath.Add(new PathMessage(AutoDetect.allWires[index].progressWires[0], AutoDetect.allWires[index].progressWires[1], index, true));
-            pushOrderForPath.Add(new PathMessage(AutoDetect.allWires[index].progressWires[1], AutoDetect.allWires[index].progressWires[2], index, false));
-            pushOrderForPath.Add(new PathMessage(AutoDetect.allWires[index].progressWires[2], AutoDetect.allWires[index].progressWires[3], index, true));
-        }
-
 
         /// <summary>
         /// 获取进一步可能的继续推动的纳米线
@@ -188,6 +195,67 @@ namespace MultiMode.Nanomanipulation
         }
 
         /// <summary>
+        /// 设置中间位置
+        /// </summary>
+        /// <param name="present"></param>
+        private void SetOneMiddleWire(int[] present)
+        {
+            MiddlePosition possible = new MiddlePosition();
+            Nanowires.Wire startWire, middleWire, targetWire;//临时存放当前找到的中间位置及其对应的起始位置和目标位置
+
+            //对每一个没有移动过的纳米线寻找中间位置
+            for (int n = 0; n < numberOfNanowires; n++)
+                if (MatrixOperations.GetTimesValueAppear(present, n) == 0)//只能移动没有出现过的纳米线，已经出现过的纳米线表示已经移动到目标位置
+                {
+                    for (int i = 0; i < middlePointsArr.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < middlePointsArr.GetLength(1); j++)
+                        {
+                            startWire = AutoDetect.allWires[n].startWire;
+                            targetWire = AutoDetect.allWires[n].targetWire;
+                            middleWire = AutoDetect.allWires[n].GetMiddleWire(middlePointsArr[i, j]);
+
+                            SetReachPosition(present);//设置到达信息
+
+                            if (CanMove(startWire, middleWire, targetWire, n, reachPosition))
+                            {
+                                AutoDetect.allWires[n].SetMiddleWire(middleWire);
+                                SetInitialMovedMatirx();
+                                double d = MathCalculate.GetDistance(startWire.rotatePoint, middleWire.rotatePoint)
+                                    + MathCalculate.GetDistance(middleWire.rotatePoint, targetWire.rotatePoint) - MathCalculate.GetDistance(startWire.rotatePoint, targetWire.rotatePoint);
+                                possible = new MiddlePosition(present, middleWire, n, d);
+                                GetPossibleResults(possible);
+                                if (middleResult.getValue)
+                                {
+                                    if (possible.possibleResults[possible.possibleResults.Count - 1][0] != null
+                                        && possible.possibleResults[possible.possibleResults.Count - 1][0].GetLength(0) == numberOfNanowires + 1
+                                        && possible.distanceAdded < middleResult.distanceAdded)
+                                        middleResult = possible;
+                                }
+                                else if (possible.possibleResults[possible.possibleResults.Count - 1][0] != null
+                                        && possible.possibleResults[possible.possibleResults.Count - 1][0].GetLength(0) == numberOfNanowires + 1)
+                                    middleResult = possible;
+                                AutoDetect.allWires[n].SetMiddleWire();
+                                //SetInitialMovedMatirx();
+                            }
+                        }
+                    }
+
+                }
+        }
+
+        //路径信息的添加
+        private void PathMessageAdd(int index)
+        {
+            pushOrderForPath.Add(new PathMessage(AutoDetect.allWires[index].progressWires[0], AutoDetect.allWires[index].progressWires[1], index, true));
+            pushOrderForPath.Add(new PathMessage(AutoDetect.allWires[index].progressWires[1], AutoDetect.allWires[index].progressWires[2], index, false));
+            pushOrderForPath.Add(new PathMessage(AutoDetect.allWires[index].progressWires[2], AutoDetect.allWires[index].progressWires[3], index, true));
+        }
+
+
+        
+
+        /// <summary>
         /// 复位各纳米线到达位置的标志，即全部在起点
         /// </summary>
         public void ResetReachPosition()
@@ -202,7 +270,7 @@ namespace MultiMode.Nanomanipulation
         /// <param name="w"></param>
         public void SetReachPosition(int[] w)
         {
-            ResetReachPosition();
+            ResetReachPosition();//调整位置信息为全部在起始位置
             if (w != null)
                 for (int i = 0; i < w.GetLength(0); i++)
                 {
@@ -215,48 +283,7 @@ namespace MultiMode.Nanomanipulation
 
         
 
-        private void SetOneMiddleWire(int[] present)
-        {
-            MiddlePosition possible = new MiddlePosition();
-            Nanowires.Wire startWire, middleWire, targetWire;
-            for (int n = 0; n < numberOfNanowires; n++)
-                if (MatrixOperations.GetTimesValueAppear(present, n) == 0)//只能移动没有出现过的纳米线，已经出现过的纳米线表示已经移动到目标位置
-                {
-                    for (int i = 0; i < middlePointsArr.GetLength(0); i++)
-                    {
-                        for (int j = 0; j < middlePointsArr.GetLength(1); j++)
-                        {
-                            startWire = AutoDetect.allWires[n].startWire;
-                            targetWire = AutoDetect.allWires[n].targetWire;
-                            middleWire = AutoDetect.allWires[n].GetMiddleWire(middlePointsArr[i, j]);
-                            SetReachPosition(present);
-                            if (CanMove(startWire, middleWire, targetWire, n, reachPosition))
-                            {
-                                AutoDetect.allWires[n].SetMiddleWire(middleWire);
-                                SetInitialMovedMatirx();
-                                double d = MathCalculate.GetDistance(startWire.rotatePoint, middleWire.rotatePoint)
-                                    + MathCalculate.GetDistance(middleWire.rotatePoint, targetWire.rotatePoint) - MathCalculate.GetDistance(startWire.rotatePoint, targetWire.rotatePoint);
-                                possible = new MiddlePosition(present, middleWire, n, d);
-                                GetPossibleResults(possible);
-                                if (middleResult.getValue)
-                                {
-                                    if (possible.possibleResults[possible.possibleResults.Count - 1][0] != null
-                                        &&possible.possibleResults[possible.possibleResults.Count - 1][0].GetLength(0) == numberOfNanowires + 1
-                                        && possible.distanceAdded < middleResult.distanceAdded)
-                                        middleResult = possible;
-                                }
-                                else if (possible.possibleResults[possible.possibleResults.Count - 1][0] != null
-                                        && possible.possibleResults[possible.possibleResults.Count - 1][0].GetLength(0) == numberOfNanowires + 1)
-                                    middleResult = possible;
-                                AutoDetect.allWires[n].SetMiddleWire();
-                            }
-                        }
-                    }
-                    
-                } 
-                
-
-        }
+        
 
         /// <summary>
         /// 判断寻找样条的新位置是否可以移动

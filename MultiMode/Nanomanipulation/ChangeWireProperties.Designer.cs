@@ -42,7 +42,7 @@
             // 
             // Confirm
             // 
-            this.Confirm.Location = new System.Drawing.Point(35, 193);
+            this.Confirm.Location = new System.Drawing.Point(33, 164);
             this.Confirm.Margin = new System.Windows.Forms.Padding(4);
             this.Confirm.Name = "Confirm";
             this.Confirm.Size = new System.Drawing.Size(100, 29);
@@ -53,7 +53,7 @@
             // 
             // Cancel
             // 
-            this.Cancel.Location = new System.Drawing.Point(171, 192);
+            this.Cancel.Location = new System.Drawing.Point(155, 164);
             this.Cancel.Margin = new System.Windows.Forms.Padding(4);
             this.Cancel.Name = "Cancel";
             this.Cancel.Size = new System.Drawing.Size(100, 29);
@@ -150,7 +150,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(300, 241);
+            this.ClientSize = new System.Drawing.Size(300, 215);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.Cancel);
             this.Controls.Add(this.Confirm);

@@ -31,7 +31,7 @@
             this.eLabel = new System.Windows.Forms.Label();
             this.qLabel = new System.Windows.Forms.Label();
             this.hangSpeedLabel = new System.Windows.Forms.Label();
-            this.pushSpeedLabel = new System.Windows.Forms.Label();
+            this.xyVelocityLabel = new System.Windows.Forms.Label();
             this.pushStepLabel = new System.Windows.Forms.Label();
             this.zStepLabel = new System.Windows.Forms.Label();
             this.tLabel = new System.Windows.Forms.Label();
@@ -77,14 +77,14 @@
             this.hangSpeedLabel.TabIndex = 2;
             this.hangSpeedLabel.Text = "hang speed";
             // 
-            // pushSpeedLabel
+            // xyVelocityLabel
             // 
-            this.pushSpeedLabel.AutoSize = true;
-            this.pushSpeedLabel.Location = new System.Drawing.Point(80, 85);
-            this.pushSpeedLabel.Name = "pushSpeedLabel";
-            this.pushSpeedLabel.Size = new System.Drawing.Size(87, 15);
-            this.pushSpeedLabel.TabIndex = 3;
-            this.pushSpeedLabel.Text = "push speed";
+            this.xyVelocityLabel.AutoSize = true;
+            this.xyVelocityLabel.Location = new System.Drawing.Point(80, 85);
+            this.xyVelocityLabel.Name = "xyVelocityLabel";
+            this.xyVelocityLabel.Size = new System.Drawing.Size(95, 15);
+            this.xyVelocityLabel.TabIndex = 3;
+            this.xyVelocityLabel.Text = "XY velocity";
             // 
             // pushStepLabel
             // 
@@ -136,7 +136,7 @@
             this.groupBox1.Controls.Add(this.eLabel);
             this.groupBox1.Controls.Add(this.qLabel);
             this.groupBox1.Controls.Add(this.tLabel);
-            this.groupBox1.Controls.Add(this.pushSpeedLabel);
+            this.groupBox1.Controls.Add(this.xyVelocityLabel);
             this.groupBox1.Controls.Add(this.hangSpeedLabel);
             this.groupBox1.Controls.Add(this.pushStepLabel);
             this.groupBox1.Controls.Add(this.zStepLabel);
@@ -252,7 +252,7 @@
         private System.Windows.Forms.Label eLabel;
         private System.Windows.Forms.Label qLabel;
         private System.Windows.Forms.Label hangSpeedLabel;
-        private System.Windows.Forms.Label pushSpeedLabel;
+        private System.Windows.Forms.Label xyVelocityLabel;
         private System.Windows.Forms.Label pushStepLabel;
         private System.Windows.Forms.Label zStepLabel;
         private System.Windows.Forms.Label tLabel;

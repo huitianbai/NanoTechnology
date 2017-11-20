@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MultiMode.Nanoman;
-using MultiMode.Nanomanipulation;
+using MultiMode.Automanipulation;
 
 namespace MultiMode.Nanodraw
 {
