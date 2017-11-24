@@ -42,6 +42,20 @@ namespace MultiMode.Automanipulation
         }
 
         /// <summary>
+        /// 计算直线外一点到直线的距离
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="startWire"></param>
+        /// <returns></returns>
+        public static double GetDistance(Nanowires.Wire startWire, PointF p)
+        {
+            if (p != startWire.firstPoint && p != startWire.secondPoint)
+                return GetDistance(p, startWire.firstPoint) * Math.Sin(GetAngleWithDirection(startWire.secondPoint, startWire.firstPoint, p));
+            else
+                return 0;
+        }
+
+        /// <summary>
         /// 计算两直线交点
         /// </summary>
         /// <param name="line1"></param最小二乘拟合后的直线斜率和截距信息>
@@ -290,17 +304,17 @@ namespace MultiMode.Automanipulation
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="l"></param>
-        /// <param name="p"></param>
+        /// <param name="current"></param>
         /// <param name="prop"></param>
         /// <returns></returns>
-        public static PointF GetPointToShow(float x, float y, double l, PointF p, double prop)
+        public static PointF GetPointToShow(PointF pivot, double l, PointF current, double prop)
         {
             PointF a = new PointF();
-            double distance = GetDistance(x, y, p.X, p.Y);
+            double distance = GetDistance(pivot, current);
             l = l * prop;
             double k = l / distance;
-            a.X = (float)(k * (p.X - x)) + x;
-            a.Y = (float)(k * (p.Y - y)) + y;
+            a.X = (float)(k * (current.X - pivot.X)) + pivot.X;
+            a.Y = (float)(k * (current.Y - pivot.Y)) + pivot.Y;
             return a;
         }
 
@@ -396,6 +410,23 @@ namespace MultiMode.Automanipulation
                 new PointF(wire.secondPoint.X + vector.X, wire.secondPoint.Y + vector.Y));
         }
 
+        /// <summary>
+        /// 计算旋转过后的纳米线
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="angle"></param>
+        /// <returns></returns>
+        public static Nanowires.Wire GetWireAfterRotate(Nanowires.Wire w, double angle)
+        {
+            double a = GetAngleWithDirection(w.firstPoint, w.secondPoint);
+            a += angle;
+            double l1 = GetDistance(w.firstPoint, w.rotatePoint);
+            double l2 = -GetDistance(w.secondPoint, w.rotatePoint);
+            PointF p1 = new PointF((float)(l1 * Math.Cos(a)) + w.rotatePoint.X, (float)(l1 * Math.Sin(a)) + w.rotatePoint.Y);
+            PointF p2 = new PointF((float)(l2 * Math.Cos(a)) + w.rotatePoint.X, (float)(l2 * Math.Sin(a)) + w.rotatePoint.Y);
+            return new Nanowires.Wire(p1, p2);
+        }
+
         public static double GetLineLength(PointF[] point)
         {
             double l = 0;
@@ -461,11 +492,20 @@ namespace MultiMode.Automanipulation
             PointF vector2 = new PointF(p2.X - m.X, p2.Y - m.Y);
             double a = vector1.X * vector2.Y - vector2.X * vector1.Y;
             if (a > 0)
-                return GetAngle(p1, m, p2);
+                return GetAngle(vector1, vector2);
             else
-                return -GetAngle(p1, m, p2);
+                return -GetAngle(vector1, vector2);
         }
-
+        public static double GetAngleWithDirection(PointF p1, PointF m1, PointF p2, PointF m2)
+        {
+            PointF vector1 = new PointF(p1.X - m1.X, p1.Y - m1.Y);
+            PointF vector2 = new PointF(p2.X - m2.X, p2.Y - m2.Y);
+            double a = vector1.X * vector2.Y - vector2.X * vector1.Y;
+            if (a > 0)
+                return GetAngle(vector1, vector2);
+            else
+                return -GetAngle(vector1, vector2);
+        }
         public static double GetAngleWithDirection(PointF m, PointF p2)
         {
             PointF p1 = new PointF(m.X + 1, m.Y);
@@ -489,5 +529,40 @@ namespace MultiMode.Automanipulation
             return new PointF(p1.X + vector.X, p1.Y + vector.Y);
         }
 
+        /// <summary>
+        /// 计算平行推移纳米线的推移矢量
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
+        public static PointF GetPushVector(Nanowires.Wire w, double distance)
+        {
+            double angle = GetAngleWithDirection(w.firstPoint, w.secondPoint);
+            return new PointF((float)(-distance * Math.Sin(angle)), (float)(distance * Math.Cos(angle)));
+        }
+
+        /// <summary>
+        /// 计算单一纳米线推移模式下鼠标移动处纳米线的位置
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static Nanowires.Wire GetWireInPushMode(Nanowires.Wire w, PointF p)
+        {
+            PointF vector = GetPushVector(w, GetDistance(w, p));
+            return GetWireAfterPush(w, vector);
+        }
+
+        /// <summary>
+        /// 计算单一纳米线旋转模式下鼠标移动处纳米线的位置
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static Nanowires.Wire GetWireInRotateMode(Nanowires.Wire w, PointF p)
+        {
+            double angle = MathCalculate.GetAngleWithDirection(w.secondPoint, w.firstPoint, p, w.rotatePoint);
+            return GetWireAfterRotate(w, angle); 
+        }
     }
 }

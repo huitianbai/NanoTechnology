@@ -15,7 +15,9 @@ namespace MultiMode.Automanipulation
         public PathParameter()
         {
             InitializeComponent();
+            saveChange = false;
         }
+        public bool saveChange;
 
         private void eTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -214,15 +216,42 @@ namespace MultiMode.Automanipulation
             //小数点的处理。
             if ((int)e.KeyChar == 46)                           //小数点
             {
-                if (probeRadiusTextBox.Text.Length <= 0)
+                if (tipRadiusTextBox.Text.Length <= 0)
                     e.Handled = true;   //小数点不能在第一位
                 else
                 {
                     float f;
                     float oldf;
                     bool b1 = false, b2 = false;
-                    b1 = float.TryParse(probeRadiusTextBox.Text, out oldf);
-                    b2 = float.TryParse(probeRadiusTextBox.Text + e.KeyChar.ToString(), out f);
+                    b1 = float.TryParse(tipRadiusTextBox.Text, out oldf);
+                    b2 = float.TryParse(tipRadiusTextBox.Text + e.KeyChar.ToString(), out f);
+                    if (b2 == false)
+                    {
+                        if (b1 == true)
+                            e.Handled = true;
+                        else
+                            e.Handled = false;
+                    }
+                }
+            }
+        }
+
+        private void zVelocitytextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (((int)e.KeyChar < 48 || (int)e.KeyChar > 57) && (int)e.KeyChar != 8 && (int)e.KeyChar != 46)
+                e.Handled = true;
+            //小数点的处理。
+            if ((int)e.KeyChar == 46)                           //小数点
+            {
+                if (zVelocityTextBox.Text.Length <= 0)
+                    e.Handled = true;   //小数点不能在第一位
+                else
+                {
+                    float f;
+                    float oldf;
+                    bool b1 = false, b2 = false;
+                    b1 = float.TryParse(tipRadiusTextBox.Text, out oldf);
+                    b2 = float.TryParse(tipRadiusTextBox.Text + e.KeyChar.ToString(), out f);
                     if (b2 == false)
                     {
                         if (b1 == true)
@@ -243,7 +272,8 @@ namespace MultiMode.Automanipulation
             zStepTextBox.Text = Convert.ToString(SavePath.zStep);
             pushStepTextBox.Text = Convert.ToString(SavePath.pushStep);
             tTextBox.Text = Convert.ToString(SavePath.t);
-            probeRadiusTextBox.Text = Convert.ToString(SavePath.probeRadius);
+            tipRadiusTextBox.Text = Convert.ToString(SavePath.probeRadius);
+            zVelocityTextBox.Text = Convert.ToString(SavePath.zVelocity);
         }
 
         private void confirm_Click(object sender, EventArgs e)
@@ -252,8 +282,10 @@ namespace MultiMode.Automanipulation
                 Convert.ToDouble(eTextBox.Text), Convert.ToDouble(qTextBox.Text),
                 Convert.ToDouble(pushSpeedTextBox.Text), Convert.ToDouble(hangSpeedTextBox.Text),
                 Convert.ToDouble(zStepTextBox.Text), Convert.ToDouble(pushStepTextBox.Text),
-                Convert.ToDouble(tTextBox.Text), Convert.ToDouble(probeRadiusTextBox.Text));
+                Convert.ToDouble(tTextBox.Text), Convert.ToDouble(tipRadiusTextBox.Text),
+                Convert.ToDouble(zVelocityTextBox.Text));
             SavePath.isSet = true;
+            saveChange = true;
             this.Close();
         }
 
@@ -261,5 +293,7 @@ namespace MultiMode.Automanipulation
         {
             this.Dispose();
         }
+
+       
     }
 }

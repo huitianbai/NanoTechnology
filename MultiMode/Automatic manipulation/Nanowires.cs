@@ -174,10 +174,14 @@ namespace MultiMode.Automanipulation
         public void SetStart()
         {
             startWire = new Wire(points[0], points[1]);
+            startWire.exchange(true);
+            startWire.rotatePoint = MathCalculate.GetRotationPoint(startWire.firstPoint, startWire.secondPoint, rotatingPointPosition);
         }
         public void SetStart(double [] result)
         {
             startWire = new Wire(result[0], result[1], result[2], result[3]);
+            startWire.exchange(true);
+            startWire.rotatePoint = MathCalculate.GetRotationPoint(startWire.firstPoint, startWire.secondPoint, rotatingPointPosition);
         }
 
         /// <summary>
@@ -197,26 +201,23 @@ namespace MultiMode.Automanipulation
         /// </summary>
         public void SetProgressWires()
         {
-            startWire.exchange(true);
-            PointF p1 = MathCalculate.GetRotationPoint(startWire.firstPoint, startWire.secondPoint, rotatingPointPosition);
             PointF p2 = MathCalculate.GetRotationPoint(targetWire.firstPoint, targetWire.secondPoint, rotatingPointPosition);
-            Wire[] m = MathCalculate.GetTwoRotatedWires(MathCalculate.GetLineLength(points), p1, p2, rotatingPointPosition);
+            Wire[] m = MathCalculate.GetTwoRotatedWires(MathCalculate.GetLineLength(points), startWire.rotatePoint, p2, rotatingPointPosition);
             Wire w1 = MathCalculate.GetCorrectWire(startWire, m);
             if (MathCalculate.GetAngle(new PointF(w1.firstPoint.X - w1.secondPoint.X, w1.firstPoint.Y - w1.secondPoint.Y), 
                 new PointF(targetWire.firstPoint.X - targetWire.secondPoint.X, targetWire.firstPoint.Y - targetWire.secondPoint.Y)) > Math.PI / 2)
             {
                 targetWire.exchange(false);
                 p2 = MathCalculate.GetRotationPoint(targetWire.firstPoint, targetWire.secondPoint, rotatingPointPosition);
-                m = MathCalculate.GetTwoRotatedWires(MathCalculate.GetLineLength(points), p1, p2, rotatingPointPosition);
+                m = MathCalculate.GetTwoRotatedWires(MathCalculate.GetLineLength(points), startWire.rotatePoint, p2, rotatingPointPosition);
                 w1 = MathCalculate.GetCorrectWire(startWire, m);
             }
-            startWire.rotatePoint = p1;
             targetWire.rotatePoint = p2;
-            w1.rotatePoint = p1;
+            w1.rotatePoint = startWire.rotatePoint;
             progressWires = new List<Wire>(4) { 
-                new Wire(startWire.firstPoint, startWire.secondPoint ,p1), 
+                startWire, 
                 w1, 
-                MathCalculate.GetWireAfterPush(w1, new PointF(p2.X - p1.X, p2.Y - p1.Y)), 
+                MathCalculate.GetWireAfterPush(w1, new PointF(p2.X - startWire.rotatePoint.X, p2.Y - startWire.rotatePoint.Y)), 
                 new Wire(targetWire.firstPoint, targetWire.secondPoint ,p2) };
             progressWires[2].rotatePoint = p2;
         }
@@ -398,6 +399,7 @@ namespace MultiMode.Automanipulation
                 stiffPushPosition = (float)s;
                 rotatingPointPosition = (float)Math.Abs(stiffPushPosition - Math.Sqrt(stiffPushPosition * stiffPushPosition - stiffPushPosition + 0.5));
             }
+            startWire.rotatePoint = MathCalculate.GetRotationPoint(startWire.firstPoint, startWire.secondPoint, rotatingPointPosition);
         }
 
     }

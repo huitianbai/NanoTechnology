@@ -145,93 +145,159 @@ namespace MultiMode.Automanipulation
         }
 
         /// <summary>
-        /// 图像显示识别结果
+        /// 手动新增纳米线调用该函数
         /// </summary>
         /// <param name="allWires"></param>
-        /// <param name="greyImage"></param>
-        /// <param name="pictureType"></param>
-        /// <param name="_numberOfLines"></param>
+        /// <param name="colorImage"></param>
         /// <param name="newPoints"></param>
+        /// <param name="Width"></param> 需要适应的 picturebox 宽度
         /// <returns></returns>
-        public Bitmap ShowSamples(List<Nanowires> allWires, Bitmap greyImage, string pictureType, int _numberOfLines, PointF[] newPoints)
+        public Bitmap ShowSamples(List<Nanowires> allWires, Bitmap colorImage, PointF[] newPoints, int Width)
         {
-            Bitmap colorImage;
-            GreyToColor gToC = new GreyToColor();
-            colorImage = gToC.PGrayToColor(greyImage, pictureType);//恢复colorImage为初始伪彩色图像
             Graphics g = Graphics.FromImage(colorImage);//在Bmp上创建一张画布
             Pen myPen = new Pen(Color.Red, 3);//3像素宽度红色画笔
-
+            //连接已经有的纳米线
             foreach (Nanowires wire in allWires)
             {
                 PointF[] p = new PointF[wire.points.GetLength(0)];
-                p = MatrixOperations.GetPointFromArr(wire, _numberOfLines, 2);
+                p = MatrixOperations.GetPointFromArr(wire, AutoDetect._numberOfLines, 2);
                 g.DrawLines(myPen, p);//用红色线段按顺序连接每个点（曲线）
                 g.DrawString('S' + (allWires.IndexOf(wire) + 1).ToString(), new Font("宋体", 8), new SolidBrush(Color.Yellow), p[0].X, p[0].Y);
             }
-            if (newPoints != null)
+
+            
+            if (newPoints != null && newPoints.GetLength(0) > 1)
             {
                 for (int i = 0; i < newPoints.GetLength(0); i++)
-                    newPoints[i].Y = _numberOfLines - 1 - newPoints[i].Y;
-                if (newPoints.GetLength(0) == 1)
-                {
-                    g.FillRectangle(new SolidBrush(Color.Red), newPoints[0].X, newPoints[0].Y, 3, 3);
-                }
-                else
-                {
-                    g.DrawLines(myPen, newPoints);//用红色线段按顺序连接每个点（曲线）
-                    g.DrawString('S' + (allWires.Count + 1).ToString(), new Font("宋体", 8), new SolidBrush(Color.Yellow), newPoints[0].X, newPoints[0].Y);
-                }
+                    newPoints[i].Y = AutoDetect._numberOfLines - 1 - newPoints[i].Y;
+
+                g.DrawLines(myPen, newPoints);//用红色线段按顺序连接每个点（曲线）
+                g.DrawString('S' + (allWires.Count + 1).ToString(), new Font("宋体", 8), new SolidBrush(Color.Yellow), newPoints[0].X, newPoints[0].Y);
+
                 for (int i = 0; i < newPoints.GetLength(0); i++)
-                    newPoints[i].Y = _numberOfLines - 1 - newPoints[i].Y;
+                    newPoints[i].Y = AutoDetect._numberOfLines - 1 - newPoints[i].Y;
             }
-            return colorImage;
+            
+
+            return ResizeImage(colorImage, Width, Width * AutoDetect._numberOfLines / AutoDetect._sampsInLine);
         }
 
-        public Bitmap ShowSamples(List<Nanowires> allWires, Bitmap greyImage, string pictureType, int _numberOfLines)
+        /// <summary>
+        /// 自动识别结束后及手动添加结束后调用该函数
+        /// </summary>
+        /// <param name="allWires"></param>
+        /// <param name="colorImage"></param>
+        /// <param name="Width"></param>
+        /// <returns></returns>
+        public Bitmap ShowSamples(List<Nanowires> allWires, Bitmap colorImage, int Width)
         {
-            Bitmap colorImage;
-            GreyToColor gToC = new GreyToColor();
-            colorImage = gToC.PGrayToColor(greyImage, pictureType);//恢复colorImage为初始伪彩色图像
             Graphics g = Graphics.FromImage(colorImage);//在Bmp上创建一张画布
             Pen myPen = new Pen(Color.Red, 3);//3像素宽度红色画笔
-
             foreach (Nanowires wire in allWires)
             {
                 PointF[] p = new PointF[wire.points.GetLength(0)];
-                p = MatrixOperations.GetPointFromArr(wire, _numberOfLines, 2);
+                p = MatrixOperations.GetPointFromArr(wire, AutoDetect._numberOfLines, 2);
+                g.DrawLines(myPen, p);//用红色线段按顺序连接每个点（曲线）
+                g.DrawString('S' + (allWires.IndexOf(wire) + 1).ToString(), new Font("宋体", 8), new SolidBrush(Color.Yellow), p[0].X, p[0].Y);
+            }
+            return ResizeImage(colorImage, Width, Width * AutoDetect._numberOfLines / AutoDetect._sampsInLine);
+        }
+
+        /// <summary>
+        /// 绘制调直后的全部纳米线
+        /// </summary>
+        /// <param name="allWires"></param>
+        /// <param name="colorImage"></param>
+        /// <param name="Width"></param>
+        /// <returns></returns>
+        public Bitmap ShowStraightenSamples(List<Nanowires> allWires, Bitmap colorImage, int Width)
+        {
+            Graphics g = Graphics.FromImage(colorImage);//在Bmp上创建一张画布
+            Pen myPen = new Pen(Color.Red, 3);//3像素宽度红色画笔
+            foreach (Nanowires wire in allWires)
+            {
+                PointF[] p = new PointF[wire.points.GetLength(0)];
+                p = MatrixOperations.GetPointFromArr(wire, AutoDetect._numberOfLines, 1);
+                g.DrawLines(myPen, p);//用红色线段按顺序连接每个点（曲线）
+                g.DrawString('S' + (allWires.IndexOf(wire) + 1).ToString(), new Font("宋体", 8), new SolidBrush(Color.Yellow), p[0].X, p[0].Y);
+            }
+            return ResizeImage(colorImage, Width, Width * AutoDetect._numberOfLines / AutoDetect._sampsInLine);
+        }
+
+        /// <summary>
+        /// 显示有目标位置的纳米线
+        /// </summary>
+        /// <param name="allWires"></param>
+        /// <param name="colorImage"></param>
+        /// <param name="Width"></param>
+        /// <returns></returns>
+        public Bitmap ShowStartAndTarget(List<Nanowires> allWires, Bitmap colorImage, int Width)
+        {
+            Graphics g = Graphics.FromImage(colorImage);//在Bmp上创建一张画布
+            Pen myPen = new Pen(Color.Red, 3);//3像素宽度红色画笔
+            foreach (Nanowires wire in allWires)
+            {
+                PointF[] p = MatrixOperations.GetPointFromArr(wire, AutoDetect._numberOfLines, 1);
                 g.DrawLines(myPen, p);//用红色线段按顺序连接每个点（曲线）
                 g.DrawString('S' + (allWires.IndexOf(wire) + 1).ToString(), new Font("宋体", 8), new SolidBrush(Color.Yellow), p[0].X, p[0].Y);
             }
 
-            return colorImage;
-        }
-
-        public Bitmap ShowSamples(List<Nanowires> allWires, Bitmap greyImage, int _numberOfLines)
-        {
-            Bitmap colorImage;
-            GreyToColor gToC = new GreyToColor();
-            colorImage = gToC.PGrayToColor(greyImage, AutoDetect.pictureType);//恢复colorImage为初始伪彩色图像
-            Graphics g = Graphics.FromImage(colorImage);//在Bmp上创建一张画布
-            Pen myPen;//3像素宽度红色画笔
+            myPen = new Pen(Color.White, 3);
             foreach (Nanowires wire in allWires)
             {
-                PointF[] p = new PointF[2];
-                myPen = new Pen(Color.Red, 3);
-                p = MatrixOperations.GetPointFromArr(wire, _numberOfLines, 1);
-                g.DrawLines(myPen, p);//用红色线段按顺序连接每个点（曲线）
-                g.DrawString('S' + (allWires.IndexOf(wire) + 1).ToString(), new Font("宋体", 8), new SolidBrush(Color.Yellow), p[0].X, p[0].Y);
                 if (wire.targetWire.getValue)
                 {
-                    myPen = new Pen(Color.White, 3);
-                    p = MatrixOperations.GetPointFromArr(wire, _numberOfLines, 3);
+                    PointF[] p = MatrixOperations.GetPointFromArr(wire, AutoDetect._numberOfLines, 3);
                     g.DrawLines(myPen, p);
-                    g.DrawString('T' + (allWires.IndexOf(wire) + 1).ToString(), new Font("宋体", 8), new SolidBrush(Color.Green), p[0].X, p[0].Y);
+                    g.DrawString('T' + (allWires.IndexOf(wire) + 1).ToString(), new Font("宋体", 8), new SolidBrush(Color.HotPink), p[0].X, p[0].Y);
                 }
-                
             }
-            return colorImage;
+            return ResizeImage(colorImage, Width, Width * AutoDetect._numberOfLines / AutoDetect._sampsInLine);
         }
 
+        /// <summary>
+        /// 显示有目标位置及可能有目标位置的图像
+        /// </summary>
+        /// <param name="allWires"></param>
+        /// <param name="colorImage"></param>
+        /// <param name="Width"></param>
+        /// <returns></returns>
+        public Bitmap ShowStartAndTarget(List<Nanowires> allWires, Bitmap colorImage, PointF[] newPoints, int Width, int index)
+        {
+            Graphics g = Graphics.FromImage(colorImage);//在Bmp上创建一张画布
+            Pen myPen = new Pen(Color.Red, 3);//3像素宽度红色画笔
+            foreach (Nanowires wire in allWires)
+            {
+                PointF[] p = new PointF[wire.points.GetLength(0)];
+                p = MatrixOperations.GetPointFromArr(wire, AutoDetect._numberOfLines, 1);
+                g.DrawLines(myPen, p);//用红色线段按顺序连接每个点（曲线）
+                g.DrawString('S' + (allWires.IndexOf(wire) + 1).ToString(), new Font("宋体", 8), new SolidBrush(Color.Yellow), p[0].X, p[0].Y);
+            }
+
+            myPen = new Pen(Color.White, 3);
+            foreach (Nanowires wire in allWires)
+            {
+                if (wire.targetWire.getValue)
+                {
+                    PointF[] p = new PointF[wire.points.GetLength(0)];
+                    p = MatrixOperations.GetPointFromArr(wire, AutoDetect._numberOfLines, 3);
+                    g.DrawLines(myPen, p);
+                    g.DrawString('T' + (allWires.IndexOf(wire) + 1).ToString(), new Font("宋体", 8), new SolidBrush(Color.HotPink), p[0].X, p[0].Y);
+                }
+            }
+            if (newPoints != null && newPoints.GetLength(0) > 1)
+            {
+                for (int i = 0; i < newPoints.GetLength(0); i++)
+                    newPoints[i].Y = AutoDetect._numberOfLines - 1 - newPoints[i].Y;
+
+                g.DrawLines(myPen, newPoints);//用红色线段按顺序连接每个点（曲线）
+                g.DrawString('T' + (index + 1).ToString(), new Font("宋体", 8), new SolidBrush(Color.HotPink), newPoints[0].X, newPoints[0].Y);
+
+                for (int i = 0; i < newPoints.GetLength(0); i++)
+                    newPoints[i].Y = AutoDetect._numberOfLines - 1 - newPoints[i].Y;
+            }
+            return ResizeImage(colorImage, Width, Width * AutoDetect._numberOfLines / AutoDetect._sampsInLine);
+        }
 
     }
 }

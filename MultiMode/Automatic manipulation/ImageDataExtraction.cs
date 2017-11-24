@@ -49,10 +49,9 @@ namespace MultiMode.Automanipulation
             StreamReader sr = new StreamReader(@fileName);
             int indexOfStr;
             int processNum = 0;
-            // soft value 提取
             while (processNum == 0)
             {
-                indexOfStr = HeaderFind(sr, "\\@Sens. ZsensSens:");
+                indexOfStr = HeaderFind(sr, "\\Scan Size:");
                 if (indexOfStr != -1)
                 {
                     if (indexOfStr == -2)
@@ -60,7 +59,7 @@ namespace MultiMode.Automanipulation
                         MessageBox.Show("Not an AFM Picture!");
                         isAFMFile = false;
                         break;
-                    }                        
+                    }
                     else
                     {
                         int idxStart = nextLine.LastIndexOf(" ");
@@ -69,13 +68,29 @@ namespace MultiMode.Automanipulation
                         idxStart = nextLine.LastIndexOf(" ");
                         str = nextLine.Substring(idxStart, nextLine.Length - idxStart);
                         //MessageBox.Show(str);
-                        softValue = Convert.ToDouble(str);
+                        scanSize = Convert.ToDouble(str) / 1000;
                         processNum += 1;
                     }
                 }
             }
-            //data offset 提取
+            // soft value 提取
             while (processNum == 1)
+            {
+                indexOfStr = HeaderFind(sr, "\\@Sens. ZsensSens:");
+                if (indexOfStr != -1)
+                {
+                    int idxStart = nextLine.LastIndexOf(" ");
+                    String str;
+                    nextLine = nextLine.Substring(0, idxStart);
+                    idxStart = nextLine.LastIndexOf(" ");
+                    str = nextLine.Substring(idxStart, nextLine.Length - idxStart);
+                    //MessageBox.Show(str);
+                    softValue = Convert.ToDouble(str);
+                    processNum += 1;
+                }
+            }
+            //data offset 提取
+            while (processNum == 2)
             {
                 indexOfStr = HeaderFind(sr, "\\Data offset:");
                 if (indexOfStr != -1)
@@ -86,7 +101,7 @@ namespace MultiMode.Automanipulation
                 }
             }
             // data length 提取
-            while (processNum == 2)
+            while (processNum == 3)
             {
                 indexOfStr = HeaderFind(sr, "\\Data length:");
                 if (indexOfStr != -1)
@@ -97,7 +112,7 @@ namespace MultiMode.Automanipulation
                 }
             }
             // bytesPerPixel 提取
-            while (processNum == 3)
+            while (processNum == 4)
             {
                 indexOfStr = HeaderFind(sr, "\\Bytes/pixel:");
                 if (indexOfStr != -1)
@@ -108,7 +123,7 @@ namespace MultiMode.Automanipulation
                 }
             }
             // sampsInLine 提取
-            while (processNum == 4)
+            while (processNum == 5)
             {
                 indexOfStr = HeaderFind(sr, "\\Samps/line:");
                 if (indexOfStr != -1)
@@ -117,22 +132,6 @@ namespace MultiMode.Automanipulation
                     //MessageBox.Show(nextLine.Substring(13));
                     sampsInLine = Convert.ToInt32(nextLine.Substring(13));
                     numberOfLines = dataLength / sampsInLine / bytesPerPixel;
-                }
-            }
-            //scan size 提取
-             while (processNum == 5)
-            {
-                indexOfStr = HeaderFind(sr, "\\Scan Size:");
-                if (indexOfStr != -1)
-                {
-                    int idxStart = nextLine.LastIndexOf(" ");
-                    String str;
-                    nextLine = nextLine.Substring(0, idxStart);
-                    idxStart = nextLine.LastIndexOf(" ");
-                    str = nextLine.Substring(idxStart, nextLine.Length - idxStart);
-                    //MessageBox.Show(str);
-                    scanSize = Convert.ToDouble(str);                   
-                    processNum += 1;
                 }
             }
             // hard value 提取

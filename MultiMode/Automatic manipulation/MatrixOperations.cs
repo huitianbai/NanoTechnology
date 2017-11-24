@@ -435,7 +435,7 @@ namespace MultiMode.Automanipulation
                     p[i].X = wire.points[i].X;
                     p[i].Y = _numberOfLines - 1 - wire.points[i].Y;
                 }
-            }
+            }                                  
             else if (mode == 3)
             {
                 p = new PointF[2];

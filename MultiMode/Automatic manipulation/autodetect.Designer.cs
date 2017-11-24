@@ -60,15 +60,16 @@
             this.runningStatusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.pB = new System.Windows.Forms.ToolStripProgressBar();
-            this.pathSavedStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.runningMessageStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.identify = new System.Windows.Forms.Button();
             this.addNewLine = new System.Windows.Forms.Button();
             this.nanowiresList = new System.Windows.Forms.ListBox();
             this.singleWireMove = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.push = new System.Windows.Forms.ToolStripMenuItem();
-            this.rotate = new System.Windows.Forms.ToolStripMenuItem();
-            this.properties = new System.Windows.Forms.ToolStripMenuItem();
-            this.deleteButton = new System.Windows.Forms.Button();
+            this.pushToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rotateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.straigtenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.propertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeButton = new System.Windows.Forms.Button();
             this.planPanel = new System.Windows.Forms.Panel();
             this.operationMode = new System.Windows.Forms.TabControl();
             this.identificationTabPage = new System.Windows.Forms.TabPage();
@@ -137,21 +138,21 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // resetToolStripMenuItem
             // 
             this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-            this.resetToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            this.resetToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
             this.resetToolStripMenuItem.Text = "Reset";
             this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
@@ -160,7 +161,7 @@
             this.saveToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.currentFigureToolStripMenuItem});
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
             this.saveToolStripMenuItem.Text = "Save";
             // 
             // currentFigureToolStripMenuItem
@@ -174,7 +175,7 @@
             // 
             this.exportPathToolStripMenuItem.Enabled = false;
             this.exportPathToolStripMenuItem.Name = "exportPathToolStripMenuItem";
-            this.exportPathToolStripMenuItem.Size = new System.Drawing.Size(168, 26);
+            this.exportPathToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
             this.exportPathToolStripMenuItem.Text = "Export Path";
             this.exportPathToolStripMenuItem.Click += new System.EventHandler(this.exportPathToolStripMenuItem_Click);
             // 
@@ -197,7 +198,7 @@
             // nanobitmapToolStripMenuItem
             // 
             this.nanobitmapToolStripMenuItem.Name = "nanobitmapToolStripMenuItem";
-            this.nanobitmapToolStripMenuItem.Size = new System.Drawing.Size(236, 26);
+            this.nanobitmapToolStripMenuItem.Size = new System.Drawing.Size(193, 26);
             this.nanobitmapToolStripMenuItem.Text = "Nanobitmap";
             // 
             // viewToolStripMenuItem
@@ -351,7 +352,7 @@
             this.abandon.Name = "abandon";
             this.abandon.Size = new System.Drawing.Size(240, 24);
             this.abandon.Text = "Abandon";
-            this.abandon.Click += new System.EventHandler(this.exit_Click);
+            this.abandon.Click += new System.EventHandler(this.abandon_Click);
             // 
             // runningStatusStrip
             // 
@@ -359,7 +360,7 @@
             this.runningStatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.pB,
-            this.pathSavedStripStatusLabel});
+            this.runningMessageStripStatusLabel});
             this.runningStatusStrip.Location = new System.Drawing.Point(0, 739);
             this.runningStatusStrip.Name = "runningStatusStrip";
             this.runningStatusStrip.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
@@ -378,11 +379,11 @@
             this.pB.Name = "pB";
             this.pB.Size = new System.Drawing.Size(133, 20);
             // 
-            // pathSavedStripStatusLabel
+            // runningMessageStripStatusLabel
             // 
-            this.pathSavedStripStatusLabel.Name = "pathSavedStripStatusLabel";
-            this.pathSavedStripStatusLabel.Size = new System.Drawing.Size(105, 21);
-            this.pathSavedStripStatusLabel.Text = "Path saved at";
+            this.runningMessageStripStatusLabel.Name = "runningMessageStripStatusLabel";
+            this.runningMessageStripStatusLabel.Size = new System.Drawing.Size(74, 21);
+            this.runningMessageStripStatusLabel.Text = "Message";
             // 
             // identify
             // 
@@ -425,41 +426,51 @@
             // 
             this.singleWireMove.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.singleWireMove.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.push,
-            this.rotate,
-            this.properties});
+            this.pushToolStripMenuItem,
+            this.rotateToolStripMenuItem,
+            this.straigtenToolStripMenuItem,
+            this.propertiesToolStripMenuItem});
             this.singleWireMove.Name = "SingleWireMove";
-            this.singleWireMove.Size = new System.Drawing.Size(155, 76);
+            this.singleWireMove.Size = new System.Drawing.Size(155, 100);
             // 
-            // push
+            // pushToolStripMenuItem
             // 
-            this.push.Name = "push";
-            this.push.Size = new System.Drawing.Size(154, 24);
-            this.push.Text = "Push";
+            this.pushToolStripMenuItem.Name = "pushToolStripMenuItem";
+            this.pushToolStripMenuItem.Size = new System.Drawing.Size(154, 24);
+            this.pushToolStripMenuItem.Text = "Push";
+            this.pushToolStripMenuItem.Click += new System.EventHandler(this.push_Click);
             // 
-            // rotate
+            // rotateToolStripMenuItem
             // 
-            this.rotate.Name = "rotate";
-            this.rotate.Size = new System.Drawing.Size(154, 24);
-            this.rotate.Text = "Rotate";
+            this.rotateToolStripMenuItem.Name = "rotateToolStripMenuItem";
+            this.rotateToolStripMenuItem.Size = new System.Drawing.Size(154, 24);
+            this.rotateToolStripMenuItem.Text = "Rotate";
+            this.rotateToolStripMenuItem.Click += new System.EventHandler(this.rotate_Click);
             // 
-            // properties
+            // straigtenToolStripMenuItem
             // 
-            this.properties.Name = "properties";
-            this.properties.Size = new System.Drawing.Size(154, 24);
-            this.properties.Text = "Properties";
-            this.properties.Click += new System.EventHandler(this.propertiesMenu);
+            this.straigtenToolStripMenuItem.Name = "straigtenToolStripMenuItem";
+            this.straigtenToolStripMenuItem.Size = new System.Drawing.Size(154, 24);
+            this.straigtenToolStripMenuItem.Text = "Straighten";
+            this.straigtenToolStripMenuItem.Click += new System.EventHandler(this.straigtenToolStripMenuItem_Click);
             // 
-            // deleteButton
+            // propertiesToolStripMenuItem
             // 
-            this.deleteButton.Location = new System.Drawing.Point(145, 60);
-            this.deleteButton.Margin = new System.Windows.Forms.Padding(4);
-            this.deleteButton.Name = "deleteButton";
-            this.deleteButton.Size = new System.Drawing.Size(115, 34);
-            this.deleteButton.TabIndex = 26;
-            this.deleteButton.Text = "Remove";
-            this.deleteButton.UseVisualStyleBackColor = true;
-            this.deleteButton.Click += new System.EventHandler(this.deleteButton_Click);
+            this.propertiesToolStripMenuItem.Name = "propertiesToolStripMenuItem";
+            this.propertiesToolStripMenuItem.Size = new System.Drawing.Size(154, 24);
+            this.propertiesToolStripMenuItem.Text = "Properties";
+            this.propertiesToolStripMenuItem.Click += new System.EventHandler(this.propertiesMenu);
+            // 
+            // removeButton
+            // 
+            this.removeButton.Location = new System.Drawing.Point(145, 60);
+            this.removeButton.Margin = new System.Windows.Forms.Padding(4);
+            this.removeButton.Name = "removeButton";
+            this.removeButton.Size = new System.Drawing.Size(115, 34);
+            this.removeButton.TabIndex = 26;
+            this.removeButton.Text = "Remove";
+            this.removeButton.UseVisualStyleBackColor = true;
+            this.removeButton.Click += new System.EventHandler(this.removeButton_Click);
             // 
             // planPanel
             // 
@@ -468,7 +479,7 @@
             this.planPanel.Controls.Add(this.operationMode);
             this.planPanel.Controls.Add(this.nanowiresList);
             this.planPanel.Controls.Add(this.nanowireListLabel);
-            this.planPanel.Location = new System.Drawing.Point(1391, 82);
+            this.planPanel.Location = new System.Drawing.Point(1391, 83);
             this.planPanel.Margin = new System.Windows.Forms.Padding(4);
             this.planPanel.Name = "planPanel";
             this.planPanel.Size = new System.Drawing.Size(296, 325);
@@ -489,7 +500,7 @@
             // identificationTabPage
             // 
             this.identificationTabPage.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.identificationTabPage.Controls.Add(this.deleteButton);
+            this.identificationTabPage.Controls.Add(this.removeButton);
             this.identificationTabPage.Controls.Add(this.identify);
             this.identificationTabPage.Controls.Add(this.addNewLine);
             this.identificationTabPage.Location = new System.Drawing.Point(4, 25);
@@ -738,15 +749,15 @@
         private System.Windows.Forms.Button addNewLine;
         private System.Windows.Forms.ToolStripMenuItem softStiffThresholdToolStripMenuItem;
         private System.Windows.Forms.ListBox nanowiresList;
-        private System.Windows.Forms.Button deleteButton;
+        private System.Windows.Forms.Button removeButton;
         private System.Windows.Forms.ContextMenuStrip mouseGetPoint;
         private System.Windows.Forms.ToolStripMenuItem reselectLastPoint;
         private System.Windows.Forms.ToolStripMenuItem reselect;
         private System.Windows.Forms.ToolStripMenuItem apply;
         private System.Windows.Forms.ContextMenuStrip singleWireMove;
-        private System.Windows.Forms.ToolStripMenuItem properties;
-        private System.Windows.Forms.ToolStripMenuItem push;
-        private System.Windows.Forms.ToolStripMenuItem rotate;
+        private System.Windows.Forms.ToolStripMenuItem propertiesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem pushToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem rotateToolStripMenuItem;
         private System.Windows.Forms.Panel planPanel;
         private System.Windows.Forms.ToolStripMenuItem abandon;
         private System.Windows.Forms.Button setTarget;
@@ -770,13 +781,14 @@
         private System.Windows.Forms.ToolStripMenuItem experientToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem manulPathToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem nanobitmapToolStripMenuItem;
-        private System.Windows.Forms.ToolStripStatusLabel pathSavedStripStatusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel runningMessageStripStatusLabel;
         private System.Windows.Forms.TabControl operationMode;
         private System.Windows.Forms.TabPage identificationTabPage;
         private System.Windows.Forms.TabPage manipulationTabPage;
         private System.Windows.Forms.Label nanowireListLabel;
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem displayToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem straigtenToolStripMenuItem;
     }
 }
 

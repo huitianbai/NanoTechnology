@@ -40,12 +40,12 @@ namespace MultiMode.Automanipulation
         public static List<Nanowires> allWires = new List<Nanowires>();
         //greyImage灰度图像,colorImage伪彩色图像
         public Bitmap greyImage, colorImage;
-        //鼠标目前的位置坐标
-        private PointF currentPoint = new Point(0, 0), pointFor_showPictureBox , _currentPointOfshowPicB;
+        //鼠标目前的位置坐标 旋转支点 终点
+        private PointF currentPoint = new Point(0, 0), pivotPoint, endPoint;
+        //提供给showPictureBox点的信息    
+        private PointF pivotPointOfShowPictureBox, currentPointOfShowPicBox;
         //鼠标取点使能，取点时光标变为十字
         private bool _readyToMove, _getshowPictureBoxDistance;
-        //取点模式 选取新的纳米线，或者确定目标位置
-        private int _getPointMode;
         //障碍物的List
         public static List<int[,]> Barriers = new List<int[,]>();
         //纳米线列表信息类
@@ -56,6 +56,18 @@ namespace MultiMode.Automanipulation
         PointF[] newPoints;
         //路径规划顺序
         public static OrderPlanning order;
+        //
+        private enum dynamicDisplayMode
+        {
+            MANUALADD = 0,
+            SETTARGET = 1,
+            ROTATE = 2,
+            PUSH = 3,
+            NULL
+        }
+        private dynamicDisplayMode setPointMode;
+        //
+        bool isPushOrRotateState; 
 
         public AutoDetect()
         {
@@ -73,7 +85,8 @@ namespace MultiMode.Automanipulation
                 80, 0.2,
                 200, 10,
                 0.02, 0.1,
-                0.1, 0.02);
+                0.1, 0.02,
+                1);
             SavePath.isSet = false;
 
             ///如果存在其他实验中已经打开图像，则直接打开该图像
@@ -130,7 +143,7 @@ namespace MultiMode.Automanipulation
             planPanel.Enabled = true;//使能planPannel
             nanowiresList.Items.Clear();//清空list内显示内容
             newPoints = null;//鼠标取点内容清空
-            _getPointMode = 0;//取点模式设置为0，即不做任何事
+            setPointMode = dynamicDisplayMode.NULL;//
             allWires = new List<Nanowires>(0);//纳米线信息清空
             _readyToMove = false;//取消准备移动
             _getshowPictureBoxDistance = false;//清选取距离标志
@@ -140,7 +153,7 @@ namespace MultiMode.Automanipulation
             abandon.Enabled = false;//退出菜单禁用
             identify.Enabled = true;//识别按钮使能
             addNewLine.Enabled = true;//添加新的纳米线按钮使能
-            deleteButton.Enabled = true;//删除按钮使能
+            removeButton.Enabled = true;//删除按钮使能
             compute.Enabled = false;//计算按钮禁用
             setTarget.Enabled = false;//确定目标位置按钮禁用
             clearShowPicBox.Enabled = false; //clearShowPicBox上下文菜单禁用
@@ -150,6 +163,9 @@ namespace MultiMode.Automanipulation
             displayPictureBox.Visible = false;
             currentFigureToolStripMenuItem.Enabled = true;
             planPanel.Enabled = true;
+            pushToolStripMenuItem.Enabled = false;
+            rotateToolStripMenuItem.Enabled = false;
+            straigtenToolStripMenuItem.Enabled = false;
         }
 
         /// <summary>
@@ -184,7 +200,7 @@ namespace MultiMode.Automanipulation
                 if (imDataEx.isAFMFile)
                 {
                     ModeSelect.AFMPicturePath = dialog.FileName;
-
+                    operationMode.SelectedIndex = 0;
                     _maxValue = imDataEx.maxValue;//图像数据最大值
                     _minValue = imDataEx.minValue;//图像数据最小值
                     _sampsInLine = imDataEx.sampsInLine;//图像每行数据个数
@@ -198,6 +214,7 @@ namespace MultiMode.Automanipulation
                     StreamWriter sw= new StreamWriter("AFM FigurePath.txt");
                     sw.WriteLine(str.Substring(0, str.LastIndexOf('\\')));
                     sw.Close();
+                    SavePath.isSet = false;
                 }            
             }
         }
@@ -207,10 +224,6 @@ namespace MultiMode.Automanipulation
         /// </summary>
         private void RenewPicture()
         {
-            //picturePanel.Width = 500;
-            //picturePanel.Height = 500;
-            //picturePanel1.Width = 500;
-            //picturePanel1.Height = 500;
             ///////////////////设置PictureBox的大小，宽度为650像素固定值
             showPictureBox.Size = new Size(picturePanel.Width, picturePanel.Width / (_sampsInLine / _numberOfLines));
             showPictureBox.Location= new Point (0, picturePanel.Height / 2 - (int)(picturePanel.Width / (_sampsInLine / _numberOfLines) / 2));
@@ -218,7 +231,7 @@ namespace MultiMode.Automanipulation
             movePictureBox.Location = new Point(0, picturePanel.Height / 2 - (int)(picturePanel.Width / (_sampsInLine / _numberOfLines) / 2));
             colorImage = gToC.PGrayToColor(greyImage, pictureType);
             showPictureBox.BackgroundImage = imageShow.ResizeImage(colorImage, movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);
-            movePictureBox.Image = colorImage;
+            movePictureBox.BackgroundImage = imageShow.ResizeImage(colorImage, movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);
             ////////////////////坐标轴信息标注////////////////////////
             MXmax.Text = Convert.ToString(_xSize / 2);
             MXmin.Text = "-" + Convert.ToString(_xSize / 2);
@@ -227,16 +240,6 @@ namespace MultiMode.Automanipulation
             Ymax.Location = new Point(Ymax.Location.X, picturePanel.Location.Y + showPictureBox.Location.Y);
             Ymin.Location = new Point(Ymin.Location.X, picturePanel.Location.Y + picturePanel.Height - showPictureBox.Location.Y - Ymin.Height);
             /////////////////////////////////////////////////////////
-        }
-
-        /// <summary>
-        /// 菜单栏Parameter下Picture按下回调函数：图像显示模式设置
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void picureToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            
         }
 
         /// <summary>
@@ -287,10 +290,10 @@ namespace MultiMode.Automanipulation
                 Nanowires wire = new Nanowires(_dataArr, a, skeleton[n], _sampsInLine, _xSize);
                 allWires.Add(wire);
             }
-
-            movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines);//显示识别结果
-
             RefreshNanowiresList(listOfWires.GetMessage(allWires));//NanowireList刷新
+
+            movePictureBox.BackgroundImage = imageShow.ShowSamples(allWires, colorImage, movePictureBox.Width);//显示识别结果
+            colorImage = gToC.PGrayToColor(greyImage, pictureType);
         }
 
         /// <summary>
@@ -347,18 +350,19 @@ namespace MultiMode.Automanipulation
         /// <param name="e"></param>
         private void movePictureBox_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_getPointMode > 0)//如果取点模式有意义，激活光标为十字
+            if (setPointMode != dynamicDisplayMode.NULL)//如果取点模式有意义，激活光标为十字
             {
                 movePictureBox.Cursor = Cursors.Cross;//光标为十字
-                currentPoint = new Point(e.X, e.Y);//刷新当前点的坐标     
+                currentPoint = new Point(e.X, e.Y);//刷新当前点的坐标 
+                if (setPointMode == dynamicDisplayMode.SETTARGET)
+                {
+                    double l = allWires[nanowiresList.SelectedIndex].length * _sampsInLine / _xSize / 1000;
+                    endPoint = MathCalculate.GetPointToShow(pivotPoint, l, currentPoint, (double)movePictureBox.Width / (double)_sampsInLine);
+                }
+                movePictureBox.Refresh();//刷新图像
             }   
             else
                 movePictureBox.Cursor = Cursors.Default;//否则光标默认
-            //取点模式为设置纳米线最终的移动位置，且已经选中了一个点，刷新图像显示，跟随光标移动目标纳米线围绕已经确定的点旋转
-            if (_getPointMode == 2 && numberOfSegments == 0)
-            {
-                movePictureBox.Invalidate();
-            }
         }
 
         /// <summary>
@@ -368,28 +372,28 @@ namespace MultiMode.Automanipulation
         /// <param name="e"></param>
         private void movePictureBox_MouseDown(object sender, MouseEventArgs e)
         {
-            if (_getPointMode == 1)//取点模式为选取新的纳米线
+            if (setPointMode == dynamicDisplayMode.MANUALADD)//取点模式为选取新的纳米线
             {
                 if (e.Button == MouseButtons.Left)//鼠标左击完成取点操作
                 {
                     if (numberOfSegments >= 0)
                     {
+                        pivotPoint = new PointF(e.X, e.Y);
                         if (reselectLastPoint.Enabled == false)//鼠标点下证明有取点，如果deleteLast菜单选项未被激活则激活deleteLast和deleteAll菜单选项
                         {
                             reselectLastPoint.Enabled = true;
                             reselect.Enabled = true;
                         }
                         numberOfSegments -= 1;//需要继续取点的个数减1
-                        //currentPoint = new Point(e.X, e.Y);//刷新当前保存点的位置
-                        GetRealPoints();//获取真实坐标
-                        newPoints = MatrixOperations.Appendix(newPoints, currentPoint);//添加新的点
-                        movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines, newPoints);//刷新图像显示
+                        newPoints = MatrixOperations.Appendix(newPoints, GetRealPoints(pivotPoint));//添加新的点
+                        movePictureBox.BackgroundImage = imageShow.ShowSamples(allWires, colorImage, newPoints, movePictureBox.Width);
+                        colorImage = gToC.PGrayToColor(greyImage, pictureType);
                         if (numberOfSegments < 0)//选取全部点后激活ready菜单选项
                             apply.Enabled = true;
                     }
                 }
             }
-            else if (_getPointMode == 2)
+            else if (setPointMode == dynamicDisplayMode.SETTARGET)
             {
                 if (e.Button == MouseButtons.Left)//鼠标左击完成取点操作
                 {
@@ -400,17 +404,17 @@ namespace MultiMode.Automanipulation
                             reselectLastPoint.Enabled = true;
                             reselect.Enabled = true;
                         }
-                        currentPoint = new Point(e.X, e.Y);
                         //第一个点为鼠标点击的落下点，第二个点需要计算
                         if (numberOfSegments == 1)
                         {
-                            newPoints = MatrixOperations.Appendix(newPoints, currentPoint);
+                            pivotPoint = new Point(e.X, e.Y);
+                            newPoints = MatrixOperations.Appendix(newPoints, GetRealPoints(pivotPoint));
                         }
                         else
                         {
-                            double l =allWires[nanowiresList.SelectedIndex].length* _sampsInLine/ _xSize / 1000;
-                            PointF another = MathCalculate.GetPointToShow(newPoints[0].X, newPoints[0].Y, l, currentPoint, (double)movePictureBox.Width / (double)_sampsInLine);
-                            newPoints = MatrixOperations.Appendix(newPoints, another);
+                            newPoints = MatrixOperations.Appendix(newPoints, GetRealPoints(endPoint));
+                            movePictureBox.BackgroundImage = imageShow.ShowStartAndTarget(allWires, colorImage, newPoints, movePictureBox.Width, nanowiresList.SelectedIndex);
+                            colorImage = gToC.PGrayToColor(greyImage, pictureType);
                         }
                         numberOfSegments -= 1;
                         if (numberOfSegments < 0)
@@ -418,24 +422,57 @@ namespace MultiMode.Automanipulation
                     }
                 }
             }
+            else if (setPointMode == dynamicDisplayMode.PUSH)
+            {
+                if (e.Button == MouseButtons.Left)//鼠标左击完成取点操作
+                {
+                    if (isPushOrRotateState)
+                    {
+                        apply.Enabled = true;
+                    }
+                    else
+                    {
+                        apply.Enabled = false;
+                    }
+                    isPushOrRotateState = !isPushOrRotateState;
+                }
+            }
+            else if (setPointMode == dynamicDisplayMode.ROTATE)
+            {
+                if (e.Button == MouseButtons.Left)//鼠标左击完成取点操作
+                {
+                    if (isPushOrRotateState)
+                    {
+                        apply.Enabled = true;
+                    }
+                    else
+                    {
+                        apply.Enabled = false;
+                    }
+                    isPushOrRotateState = !isPushOrRotateState;
+                }
+            }
+
         }
+       
         /// <summary>
-        /// 鼠标取点并不对应图中真正的点，这是由于图像显示有缩放的过程，这个函数获取实际像素位置
+        /// 获取对应图像的真实的点
         /// </summary>
-        private void GetRealPoints()
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private PointF GetRealPoints(PointF p)
         {
-           //X,Y等比例缩放，Y值关于X轴为对称轴对调
-            currentPoint.X = currentPoint.X / movePictureBox.Width * _sampsInLine;
-            currentPoint.Y = currentPoint.Y / movePictureBox.Width * _sampsInLine;
-            currentPoint.Y = _numberOfLines - 1 - currentPoint.Y;
+            return new PointF(p.X / movePictureBox.Width * _sampsInLine, _numberOfLines - 1 - p.Y / movePictureBox.Width * _sampsInLine);
         }
-        //这是有输入的情况，用在纳米线目标位置的确定函数中
-        private PointF  GetRealPoints(PointF p)
+
+        /// <summary>
+        /// 获取图像中对应pictureBox内的点
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private PointF GetBoxPoint(PointF p)
         {
-            p.X = p.X / movePictureBox.Width * _sampsInLine;
-            p.Y = p.Y / movePictureBox.Width * _sampsInLine;
-            p.Y = _numberOfLines - 1 - p.Y;
-            return p;
+            return new PointF(p.X * movePictureBox.Width / _sampsInLine, (_numberOfLines - 1 - p.Y) * movePictureBox.Width / _sampsInLine);
         }
 
         /// <summary>
@@ -453,8 +490,9 @@ namespace MultiMode.Automanipulation
             {
                 numberOfSegments = form.value;//确定需要添加的段数
                 staticNumber = form.value;//这个参数赋值过后不会改变，用于后续的比较
-                _getPointMode = 1;//鼠标取点模式设置为1，即选取新纳米线的模式
+                setPointMode = dynamicDisplayMode.MANUALADD;//鼠标取点模式设置为1，即选取新纳米线的模式
                 abandon.Enabled = true;
+                planPanel.Enabled = false;
             }
             form.Dispose();//清除form，释放内存   
         }
@@ -479,7 +517,7 @@ namespace MultiMode.Automanipulation
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void deleteButton_Click(object sender, EventArgs e)
+        private void removeButton_Click(object sender, EventArgs e)
         {
             if (nanowiresList.SelectedIndices.Count > 0)
             {
@@ -491,7 +529,8 @@ namespace MultiMode.Automanipulation
 
                 listOfWires.Delete(allWires, indexOfItems);//删除选中的纳米线
                 RefreshNanowiresList(listOfWires.GetMessage(allWires));//刷新NanowiresList显示的内容
-                movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines);//刷新movePictureBox显示的图像
+                movePictureBox.BackgroundImage = imageShow.ShowSamples(allWires, colorImage, movePictureBox.Width);
+                colorImage = gToC.PGrayToColor(greyImage, pictureType);
             }  
         }
 
@@ -503,22 +542,29 @@ namespace MultiMode.Automanipulation
         private void deleteLastToolStripMenuItem_Click(object sender, EventArgs e)
         {
             newPoints = MatrixOperations.CutLast(newPoints);//减掉上一个选取的点
+
             numberOfSegments += 1;//需要选取的点的个数加一
             apply.Enabled = false;//ready菜单选项禁用
-            if (_getPointMode == 1)//添加新样条模式
+
+            if (setPointMode == dynamicDisplayMode.MANUALADD)//添加新样条模式
             {
-                movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines, newPoints);//刷新图像显示
+                movePictureBox.BackgroundImage = imageShow.ShowSamples(allWires, colorImage, newPoints, movePictureBox.Width);
+                colorImage = gToC.PGrayToColor(greyImage, pictureType);
+                if (newPoints != null)
+                    pivotPoint = GetBoxPoint(newPoints[newPoints.GetLength(0) - 1]);
                 if (numberOfSegments == staticNumber)//如果不能继续删除点了，则deleteAll,deleteLast菜单选项禁用
                 {
                     reselect.Enabled = false;
                     reselectLastPoint.Enabled = false;
                 }
             }
-            else if (_getPointMode == 2)//确定目标位置模式
+            else if (setPointMode == dynamicDisplayMode.SETTARGET)//确定目标位置模式
             {
+                movePictureBox.Image = null;//清空图像显示
+                movePictureBox.BackgroundImage = imageShow.ShowStartAndTarget(allWires, colorImage, movePictureBox.Width);
+                colorImage = gToC.PGrayToColor(greyImage, pictureType);
                 if (numberOfSegments == 1)//不能继续删除了
                 {
-                    movePictureBox.Image = null;//清空图像显示
                     reselect.Enabled = false;
                     reselectLastPoint.Enabled = false;
                 }
@@ -533,34 +579,23 @@ namespace MultiMode.Automanipulation
         /// <param name="e"></param>
         private void ready_Click(object sender, EventArgs e)
         {
-            if (_getPointMode == 1)
+            planPanel.Enabled = true;
+            apply.Enabled = false;//ready菜单不使能
+            abandon.Enabled = false;//exit菜单不使能
+            reselectLastPoint.Enabled = false;//deleteLast菜单不使能
+            reselect.Enabled = false;//deleteAll菜单不使能
+
+            if (setPointMode == dynamicDisplayMode.MANUALADD)
             {
-                addNewLine.Enabled = true;//添加纳米线按钮使能
-                identify.Enabled = true;
-                deleteButton.Enabled = true;
-                apply.Enabled = false;//ready菜单不使能
-                abandon.Enabled = false;//exit菜单不使能
-                reselectLastPoint.Enabled = false;//deleteLast菜单不使能
-                reselect.Enabled = false;//deleteAll菜单不使能
-                _getPointMode = 0;
                 Nanowires newWire = new Nanowires(_dataArr, newPoints, _sampsInLine, _xSize);//添加新的纳米线信息
                 newPoints = null;
                 allWires.Add(newWire);//加入allWires列表
                 RefreshNanowiresList(listOfWires.GetMessage(allWires));//刷新list显示
             }
-            else if (_getPointMode == 2)
+            else if (setPointMode == dynamicDisplayMode.SETTARGET)
             {
-                apply.Enabled = false;//ready菜单不使能
-                abandon.Enabled = false;//exit菜单不使能
-                reselectLastPoint.Enabled = false;//deleteLast菜单不使能
-                reselect.Enabled = false;//deleteAll菜单不使能
-                _getPointMode = 0;
                 //给对应的纳米线设置目标位置
-                allWires[nanowiresList.SelectedIndex].SetTarget(GetRealPoints(newPoints[0]),GetRealPoints(newPoints[1]));
-                //改变movePictureBox背景图像的显示
-                movePictureBox.Image = null;
-                movePictureBox.BackgroundImage = imageShow.ResizeImage(imageShow.ShowSamples(allWires, greyImage, _numberOfLines),
-                    movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);
+                allWires[nanowiresList.SelectedIndex].SetTarget(newPoints[0], newPoints[1]);
                 newPoints = null;
                 setTarget.Enabled = false;//setTarget按钮禁用
                 bool okToRule = true;
@@ -570,12 +605,47 @@ namespace MultiMode.Automanipulation
                     {
                         okToRule = false;
                         break;
-                    }       
+                    }
                 }
                 if (okToRule)
                     compute.Enabled = true;
             }
-            
+            else if (setPointMode == dynamicDisplayMode.PUSH)
+            {
+                isPushOrRotateState = false;
+                if (!SavePath.isSet)
+                {
+                    PathParameter form = new PathParameter();
+                    form.StartPosition = FormStartPosition.CenterParent;
+                    form.SetValue();
+                    form.ShowDialog();
+                    form.Dispose();
+                    SavePath.isSet = true;
+                }
+                SavePath.SavePushPath(nanowiresList.SelectedIndex, newPoints);
+                newPoints = null;
+                exportPathToolStripMenuItem.Enabled = true;
+                runningMessageStripStatusLabel.Text = "Path of pushing number " + (nanowiresList.SelectedIndex + 1).ToString() + " nanowire parallelly is generated.";
+            }
+            else if (setPointMode == dynamicDisplayMode.ROTATE)
+            {
+                if (!SavePath.isSet)
+                {
+                    PathParameter form = new PathParameter();
+                    form.StartPosition = FormStartPosition.CenterParent;
+                    form.SetValue();
+                    form.ShowDialog();
+                    form.Dispose();
+                    SavePath.isSet = true;
+                }
+                isPushOrRotateState = false;
+                SavePath.SaveRotatePath(nanowiresList.SelectedIndex, newPoints);
+                newPoints = null;
+                exportPathToolStripMenuItem.Enabled = true;
+                runningMessageStripStatusLabel.Text = "Path of rotating number " + (nanowiresList.SelectedIndex + 1).ToString() + " nanowire is generated.";
+            }
+            setPointMode = dynamicDisplayMode.NULL;
+
         }
 
         /// <summary>
@@ -589,15 +659,20 @@ namespace MultiMode.Automanipulation
             reselectLastPoint.Enabled = false;//deleteLast菜单选项禁用
             reselect.Enabled = false;//deleteAll菜单选项禁用
             newPoints = null;
-            if (_getPointMode == 1)
+            movePictureBox.Image = null;
+
+            if (setPointMode == dynamicDisplayMode.MANUALADD)
             {
+                movePictureBox.BackgroundImage = imageShow.ShowSamples(allWires, colorImage, movePictureBox.Width);
+                colorImage = gToC.PGrayToColor(greyImage, pictureType);
                 numberOfSegments = staticNumber;//取点的个数置位
-                movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines, newPoints);//刷新图像
             }
-            else if (_getPointMode == 2)
-            {  
-                numberOfSegments = 1;//取点的个数置位
+            else if (setPointMode == dynamicDisplayMode.SETTARGET)
+            {
                 movePictureBox.Image = null;//清空图像显示
+                numberOfSegments = 1;//取点的个数置位
+                movePictureBox.BackgroundImage = imageShow.ShowStartAndTarget(allWires, colorImage, movePictureBox.Width);
+                colorImage = gToC.PGrayToColor(greyImage, pictureType);
             }
             
         }
@@ -636,36 +711,48 @@ namespace MultiMode.Automanipulation
                 allWires[nanowiresList.SelectedIndices[0]].GetDivision();//重新计算长径比
                 allWires[nanowiresList.SelectedIndices[0]].SetRotatingPointPosition(Convert.ToDouble(form.rotationPivot.Text));
                 RefreshNanowiresList(listOfWires.GetMessage(allWires));//刷新NanowiresList显示内容
+                orderTextBox.Text = null;
             }
             form.Dispose();//form删除，释放内存
         }
+
         /// <summary>
         /// 上下文菜单 MouseGetPoint -> exit 放弃该次取样
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void exit_Click(object sender, EventArgs e)
+        private void abandon_Click(object sender, EventArgs e)
         {
             apply.Enabled = false;//ready菜单选项禁用
             reselectLastPoint.Enabled = false;//deleteLast菜单选项禁用
             reselect.Enabled = false;//deleteAll菜单选项禁用
             abandon.Enabled = false;//exit菜单选项禁用
             newPoints = null;//清空全部已经选取的点
-            if (_getPointMode == 1)//取点模式为确定新纳米线
+            planPanel.Enabled = true;
+            if (setPointMode == dynamicDisplayMode.MANUALADD)//取点模式为确定新纳米线
             {
                 addNewLine.Enabled = true;//addNewLine按钮使能
                 identify.Enabled = true;//identify按钮使能
-                deleteButton.Enabled = true;//deleteButton按钮使能
+                removeButton.Enabled = true;//deleteButton按钮使能
 
-                movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines);//刷新图像
+                movePictureBox.Image = null;
+
+                movePictureBox.BackgroundImage = imageShow.ShowSamples(allWires, colorImage, movePictureBox.Width);
+                colorImage = gToC.PGrayToColor(greyImage, pictureType);
             }
-            else if (_getPointMode == 2)//取点模式为确定目标位置
+            else if (setPointMode == dynamicDisplayMode.SETTARGET)//取点模式为确定目标位置
             {
                 setTarget.Enabled = false;//setTarget按钮使能
-
                 movePictureBox.Image = null;//清空图像显示
+                movePictureBox.BackgroundImage = imageShow.ShowStartAndTarget(allWires, colorImage, movePictureBox.Width);
+                colorImage = gToC.PGrayToColor(greyImage, pictureType);
             }
-            _getPointMode = 0;//取点模式为不取点
+            else if (setPointMode == dynamicDisplayMode.PUSH || setPointMode == dynamicDisplayMode.ROTATE)
+            {
+                movePictureBox.Image = null;
+                isPushOrRotateState = false;
+            }
+            setPointMode = dynamicDisplayMode.NULL;//取点模式为不取点
         }
 
         /// <summary>
@@ -675,20 +762,19 @@ namespace MultiMode.Automanipulation
         /// <param name="e"></param>
         private void setTarget_Click(object sender, EventArgs e)
         {
+            mouseGetPoint.Items.Clear();
+            mouseGetPoint.Items.AddRange(new ToolStripItem[4] { reselectLastPoint, reselect, apply, abandon });
             numberOfSegments = 1;//设置获取线的段数为1，因为确定目标位置均为单一线段
-
-            _getPointMode = 2;//表示目前取点的模式为选定目标位置
+            setPointMode = dynamicDisplayMode.SETTARGET;//表示目前取点的模式为选定目标位置 
             abandon.Enabled = true;//退出菜单使能，表示可以退出该次纳米线目标位置的确定
             compute.Enabled = false;//路径规划计算按钮禁用
-
             allWires[nanowiresList.SelectedIndex].ClearTarget();//对于选中的纳米线清除已经确定的目标位置，因为此时点下按钮后需要对该纳米线选定新的目标位置
-            //清空前景图像Image，刷新movePictureBox的背景图像
-            movePictureBox.Image = null;
-            movePictureBox.BackgroundImage = imageShow.ResizeImage(imageShow.ShowSamples(allWires, greyImage, _numberOfLines),
-                movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);
-
+            movePictureBox.BackgroundImage = imageShow.ShowStartAndTarget(allWires, colorImage, movePictureBox.Width);
+            colorImage = gToC.PGrayToColor(greyImage, pictureType);
             orderTextBox.Text = null;
             simulateContextMenuStrip.Enabled = false;
+            planPanel.Enabled = false;
+            exportPathToolStripMenuItem.Enabled = false;
             
         }
 
@@ -699,15 +785,37 @@ namespace MultiMode.Automanipulation
         /// <param name="e"></param>
         private void movePictureBox_Paint(object sender, PaintEventArgs e)
         {
-            if (_getPointMode == 2 && numberOfSegments <= 0)//在取点模式为确定目标位置且已经取好一个点的情况执行
+            if (setPointMode == dynamicDisplayMode.MANUALADD)
             {
-                Pen p = new Pen(Color.White, 3);
-                double l = allWires[nanowiresList.SelectedIndex].length * _sampsInLine / _xSize / 1000;
-                if (currentPoint != newPoints[0])//一定要在新点和旋转中心不等时候操作
+                if (numberOfSegments < staticNumber && numberOfSegments >= 0)
                 {
-                    PointF another = MathCalculate.GetPointToShow(newPoints[0].X, newPoints[0].Y, l, currentPoint, (double)movePictureBox.Width / (double)_sampsInLine);
-                    e.Graphics.DrawLine(p, newPoints[0].X, newPoints[0].Y, another.X, another.Y);//画选定的纳米线长度的白色线
+                    e.Graphics.DrawLine(new Pen(Color.Red, 3), pivotPoint, currentPoint);
                 }
+            }
+            else if (setPointMode == dynamicDisplayMode.SETTARGET)
+            {
+                if (numberOfSegments == 0)
+                    e.Graphics.DrawLine(new Pen(Color.White, 3), pivotPoint, endPoint);
+            }
+            else if (setPointMode == dynamicDisplayMode.PUSH)
+            {
+                if (isPushOrRotateState)
+                {
+                    Nanowires.Wire w = MathCalculate.GetWireInPushMode(allWires[nanowiresList.SelectedIndex].startWire, GetRealPoints(currentPoint));
+                    newPoints = new PointF[2] { w.firstPoint, w.secondPoint };
+                    //e.Graphics.DrawLine(new Pen(Color.White, 3), GetBoxPoint(newPoints[0]), GetBoxPoint(newPoints[1]));
+                }
+                e.Graphics.DrawLine(new Pen(Color.White, 3), GetBoxPoint(newPoints[0]), GetBoxPoint(newPoints[1]));
+            }
+            else if (setPointMode == dynamicDisplayMode.ROTATE)
+            {
+                if (isPushOrRotateState)
+                {
+                    Nanowires.Wire w = MathCalculate.GetWireInRotateMode(allWires[nanowiresList.SelectedIndex].startWire, GetRealPoints(currentPoint));
+                    newPoints = new PointF[2] { w.firstPoint, w.secondPoint };
+                    //e.Graphics.DrawLine(new Pen(Color.White, 3), GetBoxPoint(newPoints[0]), GetBoxPoint(newPoints[1]));
+                }
+                e.Graphics.DrawLine(new Pen(Color.White, 3), GetBoxPoint(newPoints[0]), GetBoxPoint(newPoints[1]));
             }
         }
 
@@ -721,6 +829,10 @@ namespace MultiMode.Automanipulation
             if (_readyToMove == true)//如果目前处在确定纳米线目标位置的状态，激活设置目标位置的按钮
             {
                 setTarget.Enabled = true;
+                if (allWires[nanowiresList.SelectedIndex].bulkingStiffen.Count == 0)
+                    straigtenToolStripMenuItem.Enabled = false;
+                else
+                    straigtenToolStripMenuItem.Enabled = true;
             }
         }
 
@@ -737,7 +849,7 @@ namespace MultiMode.Automanipulation
                 {
                     clearShowPicBox.Enabled = true;
                     _getshowPictureBoxDistance = true;
-                    pointFor_showPictureBox = new Point(e.X, e.Y);
+                    pivotPointOfShowPictureBox = new Point(e.X, e.Y);
                 }
             }
         }
@@ -759,7 +871,7 @@ namespace MultiMode.Automanipulation
         /// <param name="e"></param>
         private void showPictureBox_MouseMove(object sender, MouseEventArgs e)
         {
-            _currentPointOfshowPicB = new Point(e.X, e.Y);
+            currentPointOfShowPicBox = new Point(e.X, e.Y);
             if (_getshowPictureBoxDistance)
             {
                 showPictureBox.Invalidate();//刷新图像
@@ -776,14 +888,14 @@ namespace MultiMode.Automanipulation
             if (_getshowPictureBoxDistance)
             {
                 Pen p = new Pen(Color.White, 1);
-                e.Graphics.DrawEllipse(p, pointFor_showPictureBox.X - 2, pointFor_showPictureBox.Y - 2, 4, 4);
+                e.Graphics.DrawEllipse(p, pivotPointOfShowPictureBox.X - 2, pivotPointOfShowPictureBox.Y - 2, 4, 4);
                 double distance;
-                if (_currentPointOfshowPicB != pointFor_showPictureBox)//一定要在新点和旋转中心不等时候操作
+                if (currentPointOfShowPicBox != pivotPointOfShowPictureBox)//一定要在新点和旋转中心不等时候操作
                 {
-                    distance = MathCalculate.GetDistance(_currentPointOfshowPicB, pointFor_showPictureBox) / showPictureBox.Width * _xSize;//计算选定点的实际距离,单位um
-                    e.Graphics.DrawLine(p, pointFor_showPictureBox.X, pointFor_showPictureBox.Y, _currentPointOfshowPicB.X, _currentPointOfshowPicB.Y);//画选定距离的白色线
+                    distance = MathCalculate.GetDistance(currentPointOfShowPicBox, pivotPointOfShowPictureBox) / showPictureBox.Width * _xSize;//计算选定点的实际距离,单位um
+                    e.Graphics.DrawLine(p, pivotPointOfShowPictureBox.X, pivotPointOfShowPictureBox.Y, currentPointOfShowPicBox.X, currentPointOfShowPicBox.Y);//画选定距离的白色线
                     e.Graphics.DrawString(distance.ToString("0.00") + " um", new Font("宋体", 8), new SolidBrush(Color.White),
-                        (_currentPointOfshowPicB.X + pointFor_showPictureBox.X) / 2, (_currentPointOfshowPicB.Y + pointFor_showPictureBox.Y) / 2);//标注距离
+                        (currentPointOfShowPicBox.X + pivotPointOfShowPictureBox.X) / 2, (currentPointOfShowPicBox.Y + pivotPointOfShowPictureBox.Y) / 2);//标注距离
                 }
             }
         }
@@ -797,13 +909,23 @@ namespace MultiMode.Automanipulation
         {
             if (operationMode.SelectedIndex == 0)
             {
+                mouseGetPoint.Items.Clear();
+                mouseGetPoint.Items.AddRange(new ToolStripItem[4] { reselectLastPoint, reselect, apply, abandon });
                 nanowiresList.SelectionMode = SelectionMode.MultiExtended;
-                movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines);
+                movePictureBox.BackgroundImage = imageShow.ShowSamples(allWires, colorImage, movePictureBox.Width);
+                colorImage = gToC.PGrayToColor(greyImage, pictureType);
+                pushToolStripMenuItem.Enabled = false;
+                rotateToolStripMenuItem.Enabled = false;
+                straigtenToolStripMenuItem.Enabled = false;                
             }
             else if(operationMode.SelectedIndex == 1)
             {
                 if (allWires.Count > 0)
                 {
+                    pushToolStripMenuItem.Enabled = true;
+                    rotateToolStripMenuItem.Enabled = true;
+                    straigtenToolStripMenuItem.Enabled = true;
+
                     nanowiresList.SelectionMode = SelectionMode.One;
                     compute.Enabled = false;//规划按钮禁用
                     orderTextBox.Text = null;//清空顺序文本内容
@@ -834,9 +956,8 @@ namespace MultiMode.Automanipulation
                             wire.SetStart(result);
                         }//至多只有两次弯折
                     }
-                    movePictureBox.Image = null;//清空movePictureBox的图像
-                    movePictureBox.BackgroundImage = imageShow.ResizeImage(imageShow.ShowSamples(allWires, greyImage, _numberOfLines),
-                        movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);//设置movePictureBox的背景图像，因为Image需要用来选择纳米线的最终位置
+                    movePictureBox.BackgroundImage = imageShow.ShowStraightenSamples(allWires, colorImage, movePictureBox.Width);
+                    colorImage = gToC.PGrayToColor(greyImage, pictureType);
                     if (bendWireFound)
                         MessageBox.Show("Bent wires are found!");//如果发现弯曲的纳米线，messagebox给出提示信息
                     else
@@ -852,21 +973,75 @@ namespace MultiMode.Automanipulation
             pictureForm.StartPosition = FormStartPosition.CenterParent;
             pictureForm.textFill(pictureType);
             pictureForm.ShowDialog();
-            if (pictureForm.refresh && movePictureBox.Image != null)
+            if (pictureForm.refresh)
             {
-                RenewPicture();//刷新图像
-                if (_readyToMove)//如果已经可以移动，开始选定位置
-                {
-                    movePictureBox.Image = null;//清空movePictureBox的图像
-                    movePictureBox.BackgroundImage = imageShow.ResizeImage(imageShow.ShowSamples(allWires, greyImage, _numberOfLines),
-                        movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);//设置movePictureBox的背景图像，因为Image需要用来选择纳米线的最终位置
-                }
-                else //未选定位置，只进行识别步骤或未进行任何步骤
-                {
-                    movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines);
-                }
+                //RenewPicture();//刷新图像
+                //if (_readyToMove)//如果已经可以移动，开始选定位置
+                //{
+                //    movePictureBox.BackgroundImage = imageShow.ResizeImage(imageShow.ShowSamples(allWires, greyImage, _numberOfLines),
+                //        movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);//设置movePictureBox的背景图像，因为Image需要用来选择纳米线的最终位置
+                //}
+                //else //未选定位置，只进行识别步骤或未进行任何步骤
+                //{
+                //    movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines);
+                //}
             }
             pictureForm.Dispose();
+        }
+
+
+        /// <summary>
+        /// 单个纳米线的推移
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void push_Click(object sender, EventArgs e)
+        {
+            setPointMode = dynamicDisplayMode.PUSH;
+            MessageBox.Show("Please set the position of Number " + (nanowiresList.SelectedIndex + 1).ToString() + " nanowire." );
+            mouseGetPoint.Items.Remove(reselectLastPoint);
+            mouseGetPoint.Items.Remove(reselect);
+            abandon.Enabled = true;
+            isPushOrRotateState = true;
+            planPanel.Enabled = false;
+        }
+
+        /// <summary>
+        /// 单个纳米线的旋转
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void rotate_Click(object sender, EventArgs e)
+        {
+            setPointMode = dynamicDisplayMode.ROTATE;
+            MessageBox.Show("Please set the position of Number " + (nanowiresList.SelectedIndex + 1).ToString() + " nanowire.");
+            mouseGetPoint.Items.Remove(reselectLastPoint);
+            mouseGetPoint.Items.Remove(reselect);
+            abandon.Enabled = true;
+            isPushOrRotateState = true;
+            planPanel.Enabled = false;
+        }
+
+        /// <summary>
+        /// 调直按钮使能
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void straigtenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!SavePath.isSet)
+            {
+                PathParameter form = new PathParameter();
+                form.StartPosition = FormStartPosition.CenterParent;
+                form.SetValue();
+                form.ShowDialog();
+                form.Dispose();
+                SavePath.isSet = true;
+            }
+            SavePath.SaveStraightenPath(nanowiresList.SelectedIndex);
+            runningMessageStripStatusLabel.Text = "Path of straightening number " + (nanowiresList.SelectedIndex + 1).ToString() + " nanowire is generated.";
+            exportPathToolStripMenuItem.Enabled = true;
+            movePictureBox.Image = null;
         }
 
         /// <summary>
@@ -891,8 +1066,26 @@ namespace MultiMode.Automanipulation
             order = new OrderPlanning(allWires.Count);
             pB.Value = 10;
             order.GetMoveStrategy();
-            pB.Value = 90;
+            pB.Value = 80;
             FillInOrderTextBox();
+            if (!SavePath.isSet)
+            {
+                PathParameter form = new PathParameter();
+                form.StartPosition = FormStartPosition.CenterParent;
+                form.SetValue();
+                form.ShowDialog();
+                form.Dispose();
+                SavePath.isSet = true;
+            }
+            if (order.findResult)
+            {
+                SavePath.PathGenerate();
+                runningMessageStripStatusLabel.Text = "Automatic manipulation path is generated!";
+            }
+            else
+            {
+                runningMessageStripStatusLabel.Text = "No automatic manipulation order is fouund!";
+            }
             pB.Value = 100;
         }
 
@@ -950,7 +1143,7 @@ namespace MultiMode.Automanipulation
                     if (allWires[order.pushOrderForPath[i].index].rotatingPointPosition != 1)
                     {
                         float r = (float)MathCalculate.GetDistance(order.pushOrderForPath[i].presentWire.rotatePoint, order.pushOrderForPath[i].presentWire.firstPoint);
-                        g.DrawArc(py, order.pushOrderForPath[i].presentWire.rotatePoint.X - r,
+                        g.DrawPie(py, order.pushOrderForPath[i].presentWire.rotatePoint.X - r,
                             _numberOfLines - 1 - order.pushOrderForPath[i].presentWire.rotatePoint.Y - r, 2 * r, 2 * r,
 
                             MathCalculate.GetAngleDirection(order.pushOrderForPath[i].presentWire.firstPoint,
@@ -970,7 +1163,7 @@ namespace MultiMode.Automanipulation
                     if (allWires[order.pushOrderForPath[i].index].rotatingPointPosition != 0)
                     {
                         float r = (float)MathCalculate.GetDistance(order.pushOrderForPath[i].presentWire.rotatePoint, order.pushOrderForPath[i].presentWire.secondPoint);
-                        g.DrawArc(py, order.pushOrderForPath[i].presentWire.rotatePoint.X - r,
+                        g.DrawPie(py, order.pushOrderForPath[i].presentWire.rotatePoint.X - r,
                             _numberOfLines - 1 - order.pushOrderForPath[i].presentWire.rotatePoint.Y - r, 2 * r, 2 * r,
 
                             MathCalculate.GetAngleDirection(order.pushOrderForPath[i].presentWire.secondPoint,
@@ -999,8 +1192,8 @@ namespace MultiMode.Automanipulation
                     g.DrawLine(pb, w.targetWire.firstPoint.X, _numberOfLines - 1 - w.targetWire.firstPoint.Y, w.targetWire.secondPoint.X, _numberOfLines - 1 - w.targetWire.secondPoint.Y);
                     g.DrawLine(pr, w.presentWire.firstPoint.X, _numberOfLines - 1 - w.presentWire.firstPoint.Y, w.presentWire.secondPoint.X, _numberOfLines - 1 - w.presentWire.secondPoint.Y);
                 }
-                
                 displayPictureBox.Refresh();
+                displayPictureBox.Image = colorImage;
                 Thread.Sleep(1000);
                 colorImage = gToC.PGrayToColor(greyImage, pictureType);
                 if (i == order.pushOrderForPath.Count - 1)
@@ -1011,11 +1204,11 @@ namespace MultiMode.Automanipulation
                         g.DrawLine(pr, w.presentWire.firstPoint.X, _numberOfLines - 1 - w.presentWire.firstPoint.Y, w.presentWire.secondPoint.X, _numberOfLines - 1 - w.presentWire.secondPoint.Y);
                     }
                     displayPictureBox.Refresh();
+                    displayPictureBox.Image = colorImage;
                     Thread.Sleep(1000);
                     colorImage = gToC.PGrayToColor(greyImage, pictureType);
                 }
             }
- 
             displayPictureBox.Visible = false;
             
         }
@@ -1028,7 +1221,7 @@ namespace MultiMode.Automanipulation
         /// <param name="e"></param>
         private void displayPictureBox_Paint(object sender, PaintEventArgs e)
         {
-            displayPictureBox.Image = colorImage;
+            //displayPictureBox.Image = colorImage;
         }
 
         /// <summary>
@@ -1038,8 +1231,6 @@ namespace MultiMode.Automanipulation
         /// <param name="e"></param>
         private void exportPathToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SavePath.PathGenerate();
-
             string str;
             FileStream fs = new FileStream("SavePath.txt", FileMode.OpenOrCreate);
             StreamReader sr = new StreamReader(fs);
@@ -1074,7 +1265,7 @@ namespace MultiMode.Automanipulation
 
                 //刷新路径保存进程提示栏内的信息
                 int steps = SavePath.manipulationPath.Count / 6;
-                pathSavedStripStatusLabel.Text = "Path saved at " + System.DateTime.Now.ToString() + " with " + steps.ToString() + " steps.";
+                runningMessageStripStatusLabel.Text = "Path saved at " + System.DateTime.Now.ToString() + " with " + steps.ToString() + " steps.";
 
                 Pen py = new Pen(Color.Yellow, 1);
                 Graphics g;
@@ -1086,6 +1277,7 @@ namespace MultiMode.Automanipulation
                 {
                     g.DrawLine(py, SavePath.manipulationPathForShow[i], SavePath.manipulationPathForShow[i + 1]);
                     displayPictureBox.Refresh();
+                    displayPictureBox.Image = colorImage;
                     Thread.Sleep(5);
                 }
                 Thread.Sleep(1000);
@@ -1107,6 +1299,12 @@ namespace MultiMode.Automanipulation
             form.StartPosition = FormStartPosition.CenterParent;
             form.SetValue();
             form.ShowDialog();
+            if (form.saveChange)
+            {
+                exportPathToolStripMenuItem.Enabled = false;
+                orderTextBox.Text = null;
+                runningMessageStripStatusLabel.Text = "Parameter is changed.";
+            }
             form.Dispose();
         }
 

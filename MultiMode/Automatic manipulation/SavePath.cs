@@ -12,7 +12,7 @@ namespace MultiMode.Automanipulation
         /// <summary>
         /// 生成路径需要的一系列参数
         /// </summary>
-        public static double e, q, pushStep, t, pushSpeed, hangSpeed, probeRadius, zStep;
+        public static double e, q, pushStep, t, pushSpeed, hangSpeed, probeRadius, zStep, zVelocity;
         /// <summary>
         /// 对于任意新打开的图像是否调整过参数
         /// </summary>
@@ -28,7 +28,8 @@ namespace MultiMode.Automanipulation
             double eValue, double qValue, 
             double pushSpeedValue, double hangSpeedValue,  
             double zStepValue, double pushStepValue, 
-            double tValue, double probeRadiusValue)
+            double tValue, double probeRadiusValue,
+            double zVelocityValue)
         {
             e = eValue;
             q = qValue;
@@ -38,6 +39,7 @@ namespace MultiMode.Automanipulation
             hangSpeed = hangSpeedValue;
             probeRadius = probeRadiusValue;
             zStep = zStepValue;
+            zVelocity = zVelocityValue;
         }
 
         public static void PathGenerate()
@@ -52,15 +54,17 @@ namespace MultiMode.Automanipulation
                     SaveSoftRotatePath(AutoDetect.order.pushOrderForPath[i].index,
                         -MathCalculate.GetAngleWithDirection(
                         AutoDetect.order.pushOrderForPath[i].presentWire.firstPoint,
-                        AutoDetect.order.pushOrderForPath[i].presentWire.rotatePoint,
-                        AutoDetect.order.pushOrderForPath[i].targetWire.firstPoint));
+                        AutoDetect.order.pushOrderForPath[i].presentWire.secondPoint,
+                        AutoDetect.order.pushOrderForPath[i].targetWire.firstPoint,
+                        AutoDetect.order.pushOrderForPath[i].targetWire.secondPoint));
                 else if(string.Equals(AutoDetect.allWires[AutoDetect.order.pushOrderForPath[i].index].softOrStiff, "soft") && !AutoDetect.order.pushOrderForPath[i].isRotate)
                     SaveSoftPushPath(AutoDetect.order.pushOrderForPath[i].index);
                 else if(string.Equals(AutoDetect.allWires[AutoDetect.order.pushOrderForPath[i].index].softOrStiff, "stiff") && AutoDetect.order.pushOrderForPath[i].isRotate)
                     SaveStiffRotatePath(AutoDetect.order.pushOrderForPath[i].index, -MathCalculate.GetAngleWithDirection(
                         AutoDetect.order.pushOrderForPath[i].presentWire.firstPoint, 
-                        AutoDetect.order.pushOrderForPath[i].presentWire.rotatePoint, 
-                        AutoDetect.order.pushOrderForPath[i].targetWire.firstPoint));
+                        AutoDetect.order.pushOrderForPath[i].presentWire.secondPoint, 
+                        AutoDetect.order.pushOrderForPath[i].targetWire.firstPoint,
+                        AutoDetect.order.pushOrderForPath[i].targetWire.secondPoint));
                 else if (string.Equals(AutoDetect.allWires[AutoDetect.order.pushOrderForPath[i].index].softOrStiff, "stiff") && !AutoDetect.order.pushOrderForPath[i].isRotate)
                     SaveStiffPushPath(AutoDetect.order.pushOrderForPath[i].index);
             }
@@ -87,6 +91,26 @@ namespace MultiMode.Automanipulation
                 (float)(AutoDetect.order.pushOrderForPath[index].targetWire.secondPoint.Y / AutoDetect._numberOfLines * AutoDetect._ySize - AutoDetect._ySize / 2));
             targetWire = new Nanowires.Wire(pf, ps, pr);
         }
+
+        private static void GetRealPosition(int index, PointF[] newPoints)
+        {
+            Nanowires.Wire w = new Nanowires.Wire(newPoints[0], newPoints[1]);
+
+            PointF pf = new PointF((float)(AutoDetect.allWires[index].startWire.firstPoint.X / AutoDetect._sampsInLine * AutoDetect._xSize - AutoDetect._xSize / 2),
+                (float)(AutoDetect.allWires[index].startWire.firstPoint.Y / AutoDetect._numberOfLines * AutoDetect._ySize - AutoDetect._ySize / 2));
+            PointF pr = new PointF((float)(AutoDetect.allWires[index].startWire.rotatePoint.X / AutoDetect._sampsInLine * AutoDetect._xSize - AutoDetect._xSize / 2),
+                (float)(AutoDetect.allWires[index].startWire.rotatePoint.Y / AutoDetect._numberOfLines * AutoDetect._ySize - AutoDetect._ySize / 2));
+            PointF ps = new PointF((float)(AutoDetect.allWires[index].startWire.secondPoint.X / AutoDetect._sampsInLine * AutoDetect._xSize - AutoDetect._xSize / 2),
+                (float)(AutoDetect.allWires[index].startWire.secondPoint.Y / AutoDetect._numberOfLines * AutoDetect._ySize - AutoDetect._ySize / 2));
+            startWire = new Nanowires.Wire(pf, ps, pr);
+            pf = new PointF((float)(w.firstPoint.X / AutoDetect._sampsInLine * AutoDetect._xSize - AutoDetect._xSize / 2),
+                (float)(w.firstPoint.Y / AutoDetect._numberOfLines * AutoDetect._ySize - AutoDetect._ySize / 2));
+            
+            ps = new PointF((float)(w.secondPoint.X / AutoDetect._sampsInLine * AutoDetect._xSize - AutoDetect._xSize / 2),
+                (float)(w.secondPoint.Y / AutoDetect._numberOfLines * AutoDetect._ySize - AutoDetect._ySize / 2));
+            targetWire = new Nanowires.Wire(pf, pr);
+        }
+
 
         /// <summary>
         /// 计算soft推移的deltaX
@@ -557,5 +581,56 @@ namespace MultiMode.Automanipulation
             }
         }
 
+        /// <summary>
+        /// 保存平移纳米线的路径
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="newPoints"></param>
+        public static void SavePushPath(int index, PointF[] newPoints)
+        {
+            manipulationPath = new List<double>(2) { zStep, hangSpeed };//清空已经存在的路径
+            manipulationPathForShow = new List<PointF>();//清空全部存在的路径
+            if (AutoDetect.allWires[index].bulkingStiffen.Count > 0)
+                foreach (List<PointF> p in AutoDetect.allWires[index].bulkingStiffen)
+                    SaveBulkStiffen(p, index);
+            GetRealPosition(index, newPoints);
+            if (AutoDetect.allWires[index].softOrStiff == "soft")
+                SaveSoftPushPath(index);
+            else
+                SaveStiffPushPath(index);
+        }
+
+        /// <summary>
+        /// 保存旋转纳米线的路径
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="newPoints"></param>
+        public static void SaveRotatePath(int index, PointF[] newPoints)
+        {
+            manipulationPath = new List<double>() { zStep, hangSpeed };//清空已经存在的路径
+            manipulationPathForShow = new List<PointF>();//清空全部存在的路径
+            if (AutoDetect.allWires[index].bulkingStiffen.Count > 0)
+                foreach (List<PointF> p in AutoDetect.allWires[index].bulkingStiffen)
+                    SaveBulkStiffen(p, index);
+            double angle = MathCalculate.GetAngleWithDirection(AutoDetect.allWires[index].startWire.firstPoint,
+                    AutoDetect.allWires[index].startWire.secondPoint, newPoints[0], newPoints[1]);
+            GetRealPosition(index, newPoints);
+            if (AutoDetect.allWires[index].softOrStiff == "soft")
+                SaveSoftRotatePath(index, -angle);
+            else
+                SaveStiffRotatePath(index, -angle);
+        }
+
+        /// <summary>
+        /// 保存调直纳米线的路径
+        /// </summary>
+        /// <param name="index"></param>
+        public static void SaveStraightenPath(int index)
+        {
+            manipulationPath = new List<double>() { zStep, hangSpeed };//清空已经存在的路径
+            manipulationPathForShow = new List<PointF>();//清空全部存在的路径
+            foreach (List<PointF> p in AutoDetect.allWires[index].bulkingStiffen)
+                SaveBulkStiffen(p, index);
+        }
     }
 }
