@@ -51,9 +51,10 @@
             // 
             // line
             // 
-            this.line.Location = new System.Drawing.Point(50, 34);
+            this.line.Location = new System.Drawing.Point(67, 42);
+            this.line.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.line.Name = "line";
-            this.line.Size = new System.Drawing.Size(76, 23);
+            this.line.Size = new System.Drawing.Size(101, 29);
             this.line.TabIndex = 0;
             this.line.Text = "Line";
             this.line.UseVisualStyleBackColor = true;
@@ -61,9 +62,10 @@
             // 
             // arc
             // 
-            this.arc.Location = new System.Drawing.Point(50, 72);
+            this.arc.Location = new System.Drawing.Point(67, 90);
+            this.arc.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.arc.Name = "arc";
-            this.arc.Size = new System.Drawing.Size(76, 27);
+            this.arc.Size = new System.Drawing.Size(101, 34);
             this.arc.TabIndex = 1;
             this.arc.Text = "Arc";
             this.arc.UseVisualStyleBackColor = true;
@@ -72,25 +74,28 @@
             // lineWidth
             // 
             this.lineWidth.AutoSize = true;
-            this.lineWidth.Location = new System.Drawing.Point(53, 163);
+            this.lineWidth.Location = new System.Drawing.Point(71, 204);
+            this.lineWidth.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lineWidth.Name = "lineWidth";
-            this.lineWidth.Size = new System.Drawing.Size(65, 12);
+            this.lineWidth.Size = new System.Drawing.Size(87, 15);
             this.lineWidth.TabIndex = 2;
             this.lineWidth.Text = "Line Width";
             // 
             // lineWidthinput
             // 
-            this.lineWidthinput.Location = new System.Drawing.Point(138, 160);
+            this.lineWidthinput.Location = new System.Drawing.Point(184, 200);
+            this.lineWidthinput.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.lineWidthinput.Name = "lineWidthinput";
-            this.lineWidthinput.Size = new System.Drawing.Size(76, 21);
+            this.lineWidthinput.Size = new System.Drawing.Size(100, 25);
             this.lineWidthinput.TabIndex = 3;
             this.lineWidthinput.TextChanged += new System.EventHandler(this.lineWidthinput_TextChanged);
             // 
             // click
             // 
-            this.click.Location = new System.Drawing.Point(50, 115);
+            this.click.Location = new System.Drawing.Point(67, 144);
+            this.click.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.click.Name = "click";
-            this.click.Size = new System.Drawing.Size(75, 23);
+            this.click.Size = new System.Drawing.Size(100, 29);
             this.click.TabIndex = 4;
             this.click.Text = "Circle";
             this.click.UseVisualStyleBackColor = true;
@@ -98,7 +103,8 @@
             // 
             // pathTree
             // 
-            this.pathTree.Location = new System.Drawing.Point(271, 34);
+            this.pathTree.Location = new System.Drawing.Point(361, 42);
+            this.pathTree.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.pathTree.Name = "pathTree";
             treeNode1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             treeNode1.Checked = true;
@@ -116,37 +122,40 @@
             treeNode4.Text = "Path";
             this.pathTree.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode4});
-            this.pathTree.Size = new System.Drawing.Size(230, 362);
+            this.pathTree.Size = new System.Drawing.Size(305, 452);
             this.pathTree.TabIndex = 5;
             // 
             // contextMenuStrip1
             // 
+            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.deteleToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(114, 26);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(127, 28);
             this.contextMenuStrip1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.contextMenuStrip1_MouseDown);
             // 
             // deteleToolStripMenuItem
             // 
             this.deteleToolStripMenuItem.Name = "deteleToolStripMenuItem";
-            this.deteleToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
+            this.deteleToolStripMenuItem.Size = new System.Drawing.Size(126, 24);
             this.deteleToolStripMenuItem.Text = "Detele";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(220, 163);
+            this.label1.Location = new System.Drawing.Point(293, 204);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 12);
+            this.label1.Size = new System.Drawing.Size(47, 15);
             this.label1.TabIndex = 7;
             this.label1.Text = "Pixel";
             // 
             // Generate
             // 
-            this.Generate.Location = new System.Drawing.Point(73, 251);
+            this.Generate.Location = new System.Drawing.Point(97, 314);
+            this.Generate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Generate.Name = "Generate";
-            this.Generate.Size = new System.Drawing.Size(75, 23);
+            this.Generate.Size = new System.Drawing.Size(100, 29);
             this.Generate.TabIndex = 8;
             this.Generate.Text = "Generate";
             this.Generate.UseVisualStyleBackColor = true;
@@ -154,9 +163,9 @@
             // 
             // NanoDraw
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(513, 408);
+            this.ClientSize = new System.Drawing.Size(684, 510);
             this.Controls.Add(this.Generate);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.pathTree);
@@ -165,8 +174,10 @@
             this.Controls.Add(this.lineWidth);
             this.Controls.Add(this.arc);
             this.Controls.Add(this.line);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "NanoDraw";
             this.Text = "NanoDraw";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NanoDraw_FormClosing);
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();

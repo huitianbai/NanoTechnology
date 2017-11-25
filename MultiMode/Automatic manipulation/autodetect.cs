@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 using System.Threading;
-using MultiMode.Nanoman;
 
 namespace MultiMode.Automanipulation
 {
@@ -1354,12 +1353,32 @@ namespace MultiMode.Automanipulation
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void traditionalNanomanToolStripMenuItem_Click(object sender, EventArgs e)
+        private void manualCuttingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PushByHand form = new PushByHand();
+            ModeSelect.nextExperiment = ModeSelect.experiment.MANUALCUTTING;
             this.Dispose();
-            form.ShowDialog();
-            Application.Exit();
+        }
+
+        /// <summary>
+        /// 更换为制作纳米位图
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void nanobitmapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ModeSelect.nextExperiment = ModeSelect.experiment.NANOBITMAP;
+            this.Dispose();
+        }
+
+        /// <summary>
+        /// 更换为纳米绘图
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void nanodrawToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ModeSelect.nextExperiment = ModeSelect.experiment.NANODRAW;
+            this.Dispose();
         }
 
     }

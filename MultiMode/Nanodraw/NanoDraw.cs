@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using MultiMode.Nanoman;
+using MultiMode.Cutting;
 using MultiMode.Automanipulation;
 
 namespace MultiMode.Nanodraw
@@ -71,17 +71,17 @@ namespace MultiMode.Nanodraw
 
         private void line_Click(object sender, EventArgs e)
         {
-            PushByHand.mouseSelectMode = PushByHand.drawState.DRAWLINE;
+            Cutting.ManualCutting.mouseSelectMode = Cutting.ManualCutting.drawState.DRAWLINE;
         }
 
         private void arc_Click(object sender, EventArgs e)
         {
-            PushByHand.mouseSelectMode = PushByHand.drawState.DRAWARC;
+            Cutting.ManualCutting.mouseSelectMode = Cutting.ManualCutting.drawState.DRAWARC;
         }
 
         private void circle_Click(object sender, EventArgs e)
         {
-            PushByHand.mouseSelectMode = PushByHand.drawState.DRAWCIRCLE;
+            Cutting.ManualCutting.mouseSelectMode = Cutting.ManualCutting.drawState.DRAWCIRCLE;
         }
 
         private void contextMenuStrip1_MouseDown(object sender, MouseEventArgs e)
@@ -142,7 +142,7 @@ namespace MultiMode.Nanodraw
                     double length = MathCalculate.GetDistance(t[0], t[1]);
                     double angle = MathCalculate.GetAngleWithDirection(t[0], t[1]);
                     const double RULE = 0.020;
-                    double density = RULE/(PushByHand._xSize/ PushByHand._sampsInLine);
+                    double density = RULE/(Cutting.ManualCutting._xSize/ Cutting.ManualCutting._sampsInLine);
                     double sinangle = Math.Sin(angle);
                     double cosangle = Math.Cos(angle);
                     for (double i =0; i < length; )
@@ -188,6 +188,41 @@ namespace MultiMode.Nanodraw
             }
         }
 
+        private void NanoDraw_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            switch (e.CloseReason)
+            {
+                //应用程序要求关闭窗口
+                case CloseReason.ApplicationExitCall:
+                    e.Cancel = false;// 不拦截，响应操作
+                    break;
+                //自身窗口上的关闭按钮
+                case CloseReason.FormOwnerClosing:
+                    e.Cancel = true;//拦截，不响应操作
+                    break;
+                //MDI窗体关闭事件
+                case CloseReason.MdiFormClosing:
+                    e.Cancel = false;//不拦截，不响应操作
+                    break;
+                //不明原因的关闭
+                case CloseReason.None:
+                    break;
+                //任务管理器关闭进程
+                case CloseReason.TaskManagerClosing:
+                    e.Cancel = true;//拦截，
+                    break;
+                //用户通过UI关闭窗口或者通过Alt+F4关闭窗口
+                case CloseReason.UserClosing:
+                    e.Cancel = true;//拦截，不响应操作
+                    break;
+                //操作系统准备关机
+                case CloseReason.WindowsShutDown:
+                    e.Cancel = false;//不拦截，响应操作
+                    break;
+                default:
+                    break;
+            }
+        }
         //  public addpattern(List<>)
     }
 }

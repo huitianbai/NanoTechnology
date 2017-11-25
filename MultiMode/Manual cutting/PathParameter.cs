@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace MultiMode.Nanoman
+namespace MultiMode.Cutting
 {
     public partial class PathParameter : Form
     {

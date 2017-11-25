@@ -7,7 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
-namespace MultiMode.Nanoman
+namespace MultiMode.Cutting
 {
     class SavePath
     {

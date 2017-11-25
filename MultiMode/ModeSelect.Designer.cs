@@ -34,18 +34,20 @@
             this.automanipulation = new System.Windows.Forms.RadioButton();
             this.load = new System.Windows.Forms.Button();
             this.cancel = new System.Windows.Forms.Button();
+            this.nanodraw = new System.Windows.Forms.RadioButton();
             this.modeGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // modeGroupBox
             // 
+            this.modeGroupBox.Controls.Add(this.nanodraw);
             this.modeGroupBox.Controls.Add(this.nanobitmap);
             this.modeGroupBox.Controls.Add(this.manualCutting);
             this.modeGroupBox.Controls.Add(this.automanipulation);
             this.modeGroupBox.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.modeGroupBox.Location = new System.Drawing.Point(12, 11);
             this.modeGroupBox.Name = "modeGroupBox";
-            this.modeGroupBox.Size = new System.Drawing.Size(270, 146);
+            this.modeGroupBox.Size = new System.Drawing.Size(270, 180);
             this.modeGroupBox.TabIndex = 0;
             this.modeGroupBox.TabStop = false;
             this.modeGroupBox.Text = "Select experiment";
@@ -53,7 +55,7 @@
             // nanobitmap
             // 
             this.nanobitmap.AutoSize = true;
-            this.nanobitmap.Location = new System.Drawing.Point(42, 108);
+            this.nanobitmap.Location = new System.Drawing.Point(42, 142);
             this.nanobitmap.Name = "nanobitmap";
             this.nanobitmap.Size = new System.Drawing.Size(116, 19);
             this.nanobitmap.TabIndex = 2;
@@ -85,7 +87,7 @@
             // 
             // load
             // 
-            this.load.Location = new System.Drawing.Point(41, 161);
+            this.load.Location = new System.Drawing.Point(41, 209);
             this.load.Name = "load";
             this.load.Size = new System.Drawing.Size(75, 35);
             this.load.TabIndex = 1;
@@ -95,7 +97,7 @@
             // 
             // cancel
             // 
-            this.cancel.Location = new System.Drawing.Point(173, 162);
+            this.cancel.Location = new System.Drawing.Point(173, 208);
             this.cancel.Name = "cancel";
             this.cancel.Size = new System.Drawing.Size(75, 35);
             this.cancel.TabIndex = 2;
@@ -103,11 +105,22 @@
             this.cancel.UseVisualStyleBackColor = true;
             this.cancel.Click += new System.EventHandler(this.cancel_Click);
             // 
+            // nanodraw
+            // 
+            this.nanodraw.AutoSize = true;
+            this.nanodraw.Location = new System.Drawing.Point(42, 105);
+            this.nanodraw.Name = "nanodraw";
+            this.nanodraw.Size = new System.Drawing.Size(92, 19);
+            this.nanodraw.TabIndex = 3;
+            this.nanodraw.TabStop = true;
+            this.nanodraw.Text = "Nanodraw";
+            this.nanodraw.UseVisualStyleBackColor = true;
+            // 
             // ModeSelect
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(294, 211);
+            this.ClientSize = new System.Drawing.Size(294, 275);
             this.Controls.Add(this.cancel);
             this.Controls.Add(this.load);
             this.Controls.Add(this.modeGroupBox);
@@ -128,6 +141,7 @@
         private System.Windows.Forms.RadioButton automanipulation;
         private System.Windows.Forms.Button load;
         private System.Windows.Forms.Button cancel;
+        private System.Windows.Forms.RadioButton nanodraw;
     }
 }
 

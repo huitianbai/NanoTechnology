@@ -7,9 +7,9 @@ using MultiMode.Nanodraw;
 using MultiMode.Automanipulation;
 
 
-namespace MultiMode.Nanoman
+namespace MultiMode.Cutting
 {
-    public partial class PushByHand : Form
+    public partial class ManualCutting : Form
     {
         //保存提取的AFM图像数据
         double[,] _dataArr;
@@ -37,7 +37,7 @@ namespace MultiMode.Nanoman
         /// </summary>
         private PointF pivotPoint, endPoint, currentPoint;
         NanoDraw nanodraw;
-      Patternstruct patternstore = new Patternstruct();
+        Patternstruct patternstore = new Patternstruct();
         // 
         public enum drawState{
             HANDPUSH = 0,
@@ -47,18 +47,17 @@ namespace MultiMode.Nanoman
             DRAWCOUNT
         }
         public static drawState mouseSelectMode;
+        int mode;
 
-
-        public PushByHand()
+        public ManualCutting(ModeSelect.experiment exp)
         {
             InitializeComponent();
             Initial();//初始化
-
+            SetControlElementPosition();
             ///初始化保存路径的参数和路径
             SavePath.Initial();
             mouseSelectMode = drawState.DRAWCOUNT;
-
-
+            mode = (int)exp;
             ///如果在其他文件中已经打开图像，则直接打开该图像
             if (ModeSelect.AFMPicturePath != null)
             {
@@ -78,6 +77,18 @@ namespace MultiMode.Nanoman
             }
         }
 
+        private void SetControlElementPosition()
+        {
+            picturePanel.Location = new Point(55, 50);
+            picturePanel.Size = new Size(500, 500);
+            Y0.Location = new Point(30, 297);
+            Ymax.Location = new Point(30, 50);
+            Ymin.Location = new Point(30, 540);
+            X0.Location = new Point(296, 550);
+            Xmax.Location = new Point(540, 550);
+            Xmin.Location = new Point(55, 550);
+        }
+
         /// <summary>
         /// 切换到自动化纳米操纵界面
         /// </summary>
@@ -85,11 +96,10 @@ namespace MultiMode.Nanoman
         /// <param name="e"></param>
         private void AutomanipulationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AutoDetect form = new AutoDetect();
+            ModeSelect.nextExperiment = ModeSelect.experiment.AUTOMANIPULATION;
+            nanodraw.Dispose();
             this.Dispose();
-            form.ShowDialog();
             
-            Application.Exit();//退出软件
         }
 
         /// <summary>
@@ -280,8 +290,8 @@ namespace MultiMode.Nanoman
                     {
                         endPoint = new PointF(e.X, e.Y);
                         //NanoDraw.add_line_path(pivotPoint,endPoint);
-                        patternstore.patternLine.Add(new PointF[2] { new PointF((float)(pivotPoint.X / showPictureBox.Width * PushByHand._sampsInLine) , (float)(pivotPoint.Y / showPictureBox.Height * PushByHand._numberOfLines)),
-                            new PointF((float)(endPoint.X / showPictureBox.Width * PushByHand._sampsInLine) , (float)(endPoint.Y / showPictureBox.Height * PushByHand._numberOfLines))});
+                        patternstore.patternLine.Add(new PointF[2] { new PointF((float)(pivotPoint.X / showPictureBox.Width * ManualCutting._sampsInLine) , (float)(pivotPoint.Y / showPictureBox.Height * ManualCutting._numberOfLines)),
+                            new PointF((float)(endPoint.X / showPictureBox.Width * ManualCutting._sampsInLine) , (float)(endPoint.Y / showPictureBox.Height * ManualCutting._numberOfLines))});
 
                         showPictureBox.BackgroundImage = imageShow.ResizeImage(RefreshFigure.BackgroundImageRefresh(colorImage, (int) mouseSelectMode, patternstore.patternLine),
                                 showPictureBox.Width, showPictureBox.Width * _numberOfLines / _sampsInLine);
@@ -299,8 +309,8 @@ namespace MultiMode.Nanoman
                     else if (number == 0)
                     {
                         endPoint = new PointF(e.X, e.Y);
-                        patternstore.patternCircle.Add(new PointF[2] { new PointF((float)(pivotPoint.X / showPictureBox.Width * PushByHand._sampsInLine) , (float)(pivotPoint.Y / showPictureBox.Height * PushByHand._numberOfLines)),
-                            new PointF((float)(endPoint.X / showPictureBox.Width * PushByHand._sampsInLine) , (float)(endPoint.Y / showPictureBox.Height * PushByHand._numberOfLines))});
+                        patternstore.patternCircle.Add(new PointF[2] { new PointF((float)(pivotPoint.X / showPictureBox.Width * ManualCutting._sampsInLine) , (float)(pivotPoint.Y / showPictureBox.Height * ManualCutting._numberOfLines)),
+                            new PointF((float)(endPoint.X / showPictureBox.Width * ManualCutting._sampsInLine) , (float)(endPoint.Y / showPictureBox.Height * ManualCutting._numberOfLines))});
                         showPictureBox.BackgroundImage = imageShow.ResizeImage(RefreshFigure.BackgroundImageRefresh(colorImage, (int)mouseSelectMode, patternstore.patternCircle),
                                 showPictureBox.Width, showPictureBox.Width * _numberOfLines / _sampsInLine);
                         colorImage = gToC.PGrayToColor(greyImage, pictureType);
@@ -338,9 +348,38 @@ namespace MultiMode.Nanoman
 
         private void nanodrawToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //showPictureBox.ContextMenu = null; 
+            nanodrawToolStripMenuItem.Visible = false;
+            manualCuttingToolStripMenuItem.Visible = true;
             nanodraw = new NanoDraw();
             nanodraw.Show();
+        }
+
+        private void nanobitmapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ModeSelect.nextExperiment = ModeSelect.experiment.NANOBITMAP;
+            nanodraw = new NanoDraw();
+            this.Dispose();
+        }
+
+        private void ManualCutting_Load(object sender, EventArgs e)
+        {
+            if (mode == 2)
+            {
+                nanodrawToolStripMenuItem.Visible = false;
+                nanodraw = new NanoDraw();
+                nanodraw.Show();
+            }
+            else if (mode == 1)
+            {
+                manualCuttingToolStripMenuItem.Visible = false;
+            }
+        }
+
+        private void manualCuttingToolStripMenuItem_Click(object sender, EventArgs e)
+        { 
+            nanodrawToolStripMenuItem.Visible = true;
+            manualCuttingToolStripMenuItem.Visible = false;
+            nanodraw.Dispose();
         }
 
         /// <summary>

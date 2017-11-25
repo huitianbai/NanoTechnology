@@ -117,11 +117,11 @@
       <DependentUpon>PathParameter.cs</DependentUpon>
     </Compile>
     <Compile Include="Manual cutting\Patternstruct.cs" />
-    <Compile Include="Manual cutting\PushByHand.cs">
+    <Compile Include="Manual cutting\ManualCutting.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Manual cutting\PushByHand.Designer.cs">
-      <DependentUpon>PushByHand.cs</DependentUpon>
+    <Compile Include="Manual cutting\ManualCutting.Designer.cs">
+      <DependentUpon>ManualCutting.cs</DependentUpon>
     </Compile>
     <Compile Include="Manual cutting\RefreshFigure.cs" />
     <Compile Include="Manual cutting\SavePath.cs" />
@@ -157,8 +157,8 @@
     <EmbeddedResource Include="Manual cutting\PathParameter.resx">
       <DependentUpon>PathParameter.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Manual cutting\PushByHand.resx">
-      <DependentUpon>PushByHand.cs</DependentUpon>
+    <EmbeddedResource Include="Manual cutting\ManualCutting.resx">
+      <DependentUpon>ManualCutting.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

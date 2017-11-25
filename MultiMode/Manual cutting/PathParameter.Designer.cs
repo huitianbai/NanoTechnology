@@ -1,4 +1,4 @@
-﻿namespace MultiMode.Nanoman
+﻿namespace MultiMode.Cutting
 {
     partial class PathParameter
     {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using MultiMode.Automanipulation;
 
-namespace MultiMode.Nanoman
+namespace MultiMode.Cutting
 {
     class RefreshFigure
     {
@@ -17,10 +17,10 @@ namespace MultiMode.Nanoman
             PointF p1, p2;
             for (int i = 0; i < SavePath.handPath.Count; i += 2)
             {
-                p1 = new PointF((float)((SavePath.handPath[i].X + PushByHand._xSize / 2) / PushByHand._xSize * PushByHand._sampsInLine),
-                    (float)(PushByHand._numberOfLines - 1 - (SavePath.handPath[i].Y + PushByHand._ySize / 2) / PushByHand._ySize * PushByHand._numberOfLines));
-                p2 = new PointF((float)((SavePath.handPath[i + 1].X + PushByHand._xSize / 2) / PushByHand._xSize * PushByHand._sampsInLine),
-                    (float)(PushByHand._numberOfLines - 1 - (SavePath.handPath[i + 1].Y + PushByHand._ySize / 2) / PushByHand._ySize * PushByHand._numberOfLines));
+                p1 = new PointF((float)((SavePath.handPath[i].X + ManualCutting._xSize / 2) / ManualCutting._xSize * ManualCutting._sampsInLine),
+                    (float)(ManualCutting._numberOfLines - 1 - (SavePath.handPath[i].Y + ManualCutting._ySize / 2) / ManualCutting._ySize * ManualCutting._numberOfLines));
+                p2 = new PointF((float)((SavePath.handPath[i + 1].X + ManualCutting._xSize / 2) / ManualCutting._xSize * ManualCutting._sampsInLine),
+                    (float)(ManualCutting._numberOfLines - 1 - (SavePath.handPath[i + 1].Y + ManualCutting._ySize / 2) / ManualCutting._ySize * ManualCutting._numberOfLines));
 
                 g.DrawLine(myPen, p1, p2);
             }

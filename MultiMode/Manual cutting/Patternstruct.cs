@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-namespace MultiMode.Nanoman
+namespace MultiMode.Cutting
 {
    public class Patternstruct
     {
