@@ -97,9 +97,9 @@ namespace MultiMode.Cutting
         private void AutomanipulationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ModeSelect.nextExperiment = ModeSelect.experiment.AUTOMANIPULATION;
-            nanodraw.Dispose();
+            if(nanodraw != null)
+                nanodraw.Dispose();
             this.Dispose();
-            
         }
 
         /// <summary>
@@ -350,8 +350,13 @@ namespace MultiMode.Cutting
         {
             nanodrawToolStripMenuItem.Visible = false;
             manualCuttingToolStripMenuItem.Visible = true;
+            mouseSelectMode = drawState.DRAWCOUNT;
+            manualCuttingContextMenuStrip.Enabled = false;
+            if(showPictureBox.BackgroundImage != null)
+                showPictureBox.BackgroundImage = imageShow.ResizeImage(colorImage, showPictureBox.Width, showPictureBox.Width * _numberOfLines / _sampsInLine);
             nanodraw = new NanoDraw();
             nanodraw.Show();
+            
         }
 
         private void nanobitmapToolStripMenuItem_Click(object sender, EventArgs e)
@@ -379,6 +384,10 @@ namespace MultiMode.Cutting
         { 
             nanodrawToolStripMenuItem.Visible = true;
             manualCuttingToolStripMenuItem.Visible = false;
+            mouseSelectMode = drawState.DRAWCOUNT;
+            manualCuttingContextMenuStrip.Enabled = true;
+            if (showPictureBox.BackgroundImage != null)
+                showPictureBox.BackgroundImage = imageShow.ResizeImage(colorImage, showPictureBox.Width, showPictureBox.Width * _numberOfLines / _sampsInLine);
             nanodraw.Dispose();
         }
 
