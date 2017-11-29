@@ -44,8 +44,9 @@
             this.savePathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.experimentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AutomanipulationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.nanobitmapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.manualCuttingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.nanodrawToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nanobitmapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.parameterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pathToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,7 +59,6 @@
             this.Ymax = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.pathSavedStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.manualCuttingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.showPictureBox)).BeginInit();
             this.manualCuttingContextMenuStrip.SuspendLayout();
             this.mainMenu.SuspendLayout();
@@ -96,28 +96,28 @@
             // addPathToolStripMenuItem
             // 
             this.addPathToolStripMenuItem.Name = "addPathToolStripMenuItem";
-            this.addPathToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.addPathToolStripMenuItem.Size = new System.Drawing.Size(155, 24);
             this.addPathToolStripMenuItem.Text = "Add Path";
             this.addPathToolStripMenuItem.Click += new System.EventHandler(this.addPathToolStripMenuItem_Click);
             // 
             // deleteLastToolStripMenuItem
             // 
             this.deleteLastToolStripMenuItem.Name = "deleteLastToolStripMenuItem";
-            this.deleteLastToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.deleteLastToolStripMenuItem.Size = new System.Drawing.Size(155, 24);
             this.deleteLastToolStripMenuItem.Text = "Delete last";
             this.deleteLastToolStripMenuItem.Click += new System.EventHandler(this.deleteLastToolStripMenuItem_Click);
             // 
             // deleteAllToolStripMenuItem
             // 
             this.deleteAllToolStripMenuItem.Name = "deleteAllToolStripMenuItem";
-            this.deleteAllToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.deleteAllToolStripMenuItem.Size = new System.Drawing.Size(155, 24);
             this.deleteAllToolStripMenuItem.Text = "Delete all";
             this.deleteAllToolStripMenuItem.Click += new System.EventHandler(this.deleteAllToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(155, 24);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -150,14 +150,14 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(154, 26);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // resetToolStripMenuItem
             // 
             this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-            this.resetToolStripMenuItem.Size = new System.Drawing.Size(154, 26);
+            this.resetToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
             this.resetToolStripMenuItem.Text = "Reset";
             this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
             // 
@@ -166,7 +166,7 @@
             this.saveToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.pictureToolStripMenuItem});
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(154, 26);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
             this.saveToolStripMenuItem.Text = "Save";
             // 
             // pictureToolStripMenuItem
@@ -179,8 +179,8 @@
             // savePathToolStripMenuItem
             // 
             this.savePathToolStripMenuItem.Name = "savePathToolStripMenuItem";
-            this.savePathToolStripMenuItem.Size = new System.Drawing.Size(154, 26);
-            this.savePathToolStripMenuItem.Text = "Save Path";
+            this.savePathToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.savePathToolStripMenuItem.Text = "Export Path";
             this.savePathToolStripMenuItem.Click += new System.EventHandler(this.savePathToolStripMenuItem_Click);
             // 
             // experimentToolStripMenuItem
@@ -201,12 +201,12 @@
             this.AutomanipulationToolStripMenuItem.Text = "Automatic manipulation";
             this.AutomanipulationToolStripMenuItem.Click += new System.EventHandler(this.AutomanipulationToolStripMenuItem_Click);
             // 
-            // nanobitmapToolStripMenuItem
+            // manualCuttingToolStripMenuItem
             // 
-            this.nanobitmapToolStripMenuItem.Name = "nanobitmapToolStripMenuItem";
-            this.nanobitmapToolStripMenuItem.Size = new System.Drawing.Size(259, 26);
-            this.nanobitmapToolStripMenuItem.Text = "Nanobitmap";
-            this.nanobitmapToolStripMenuItem.Click += new System.EventHandler(this.nanobitmapToolStripMenuItem_Click);
+            this.manualCuttingToolStripMenuItem.Name = "manualCuttingToolStripMenuItem";
+            this.manualCuttingToolStripMenuItem.Size = new System.Drawing.Size(259, 26);
+            this.manualCuttingToolStripMenuItem.Text = "Manual Cutting";
+            this.manualCuttingToolStripMenuItem.Click += new System.EventHandler(this.manualCuttingToolStripMenuItem_Click);
             // 
             // nanodrawToolStripMenuItem
             // 
@@ -214,6 +214,13 @@
             this.nanodrawToolStripMenuItem.Size = new System.Drawing.Size(259, 26);
             this.nanodrawToolStripMenuItem.Text = "Nanodraw";
             this.nanodrawToolStripMenuItem.Click += new System.EventHandler(this.nanodrawToolStripMenuItem_Click);
+            // 
+            // nanobitmapToolStripMenuItem
+            // 
+            this.nanobitmapToolStripMenuItem.Name = "nanobitmapToolStripMenuItem";
+            this.nanobitmapToolStripMenuItem.Size = new System.Drawing.Size(259, 26);
+            this.nanobitmapToolStripMenuItem.Text = "Nanobitmap";
+            this.nanobitmapToolStripMenuItem.Click += new System.EventHandler(this.nanobitmapToolStripMenuItem_Click);
             // 
             // parameterToolStripMenuItem
             // 
@@ -226,7 +233,7 @@
             // pathToolStripMenuItem
             // 
             this.pathToolStripMenuItem.Name = "pathToolStripMenuItem";
-            this.pathToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.pathToolStripMenuItem.Size = new System.Drawing.Size(116, 26);
             this.pathToolStripMenuItem.Text = "Path";
             this.pathToolStripMenuItem.Click += new System.EventHandler(this.pathToolStripMenuItem_Click);
             // 
@@ -313,13 +320,6 @@
             this.pathSavedStripStatusLabel.Name = "pathSavedStripStatusLabel";
             this.pathSavedStripStatusLabel.Size = new System.Drawing.Size(109, 20);
             this.pathSavedStripStatusLabel.Text = "Path saved at ";
-            // 
-            // manualCuttingToolStripMenuItem
-            // 
-            this.manualCuttingToolStripMenuItem.Name = "manualCuttingToolStripMenuItem";
-            this.manualCuttingToolStripMenuItem.Size = new System.Drawing.Size(259, 26);
-            this.manualCuttingToolStripMenuItem.Text = "Manual Cutting";
-            this.manualCuttingToolStripMenuItem.Click += new System.EventHandler(this.manualCuttingToolStripMenuItem_Click);
             // 
             // ManualCutting
             // 

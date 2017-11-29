@@ -644,7 +644,6 @@ namespace NanoExperiment.Automanipulation
                 runningMessageStripStatusLabel.Text = "Path of rotating number " + (nanowiresList.SelectedIndex + 1).ToString() + " nanowire is generated.";
             }
             setPointMode = dynamicDisplayMode.NULL;
-
         }
 
         /// <summary>
@@ -825,7 +824,7 @@ namespace NanoExperiment.Automanipulation
         /// <param name="e"></param>
         private void NanowiresList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (_readyToMove == true)//如果目前处在确定纳米线目标位置的状态，激活设置目标位置的按钮
+            if (_readyToMove == true && nanowiresList.SelectedItems != null )//如果目前处在确定纳米线目标位置的状态，激活设置目标位置的按钮
             {
                 setTarget.Enabled = true;
                 if (allWires[nanowiresList.SelectedIndex].bulkingStiffen.Count == 0)
@@ -974,16 +973,13 @@ namespace NanoExperiment.Automanipulation
             pictureForm.ShowDialog();
             if (pictureForm.refresh)
             {
-                //RenewPicture();//刷新图像
-                //if (_readyToMove)//如果已经可以移动，开始选定位置
-                //{
-                //    movePictureBox.BackgroundImage = imageShow.ResizeImage(imageShow.ShowSamples(allWires, greyImage, _numberOfLines),
-                //        movePictureBox.Width, movePictureBox.Width * _numberOfLines / _sampsInLine);//设置movePictureBox的背景图像，因为Image需要用来选择纳米线的最终位置
-                //}
-                //else //未选定位置，只进行识别步骤或未进行任何步骤
-                //{
-                //    movePictureBox.Image = imageShow.ShowSamples(allWires, greyImage, pictureType, _numberOfLines);
-                //}
+                colorImage = gToC.PGrayToColor(greyImage, pictureType);
+                showPictureBox.Image = imageShow.ResizeImage(colorImage, showPictureBox.Width, showPictureBox.Height);
+                if (_readyToMove)
+                    movePictureBox.BackgroundImage = imageShow.ShowStartAndTarget(allWires, colorImage, movePictureBox.Width);
+                else
+                    movePictureBox.BackgroundImage = imageShow.ShowSamples(allWires, colorImage, movePictureBox.Width);
+                colorImage = gToC.PGrayToColor(greyImage, pictureType);
             }
             pictureForm.Dispose();
         }
@@ -1329,18 +1325,8 @@ namespace NanoExperiment.Automanipulation
 
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-
-                if (movePictureBox.Image == null)
-                {
-                    Bitmap bmp = new Bitmap(movePictureBox.BackgroundImage);
-                    bmp.Save(sfd.FileName);
-                }
-                else
-                {
-                    Bitmap bmp = new Bitmap(movePictureBox.Image);
-                    bmp.Save(sfd.FileName);
-                }
-
+                Bitmap bmp = new Bitmap(movePictureBox.BackgroundImage);
+                bmp.Save(sfd.FileName);
                 StreamWriter sw = new StreamWriter("SavePicture.txt");
                 str = sfd.FileName;
                 sw.WriteLine(str.Substring(0, str.LastIndexOf('\\')));

@@ -15,13 +15,13 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_BB736A3E586941CAB51096F015EAF463"
+        "MsmKey" = "8:_0AEABE33A73044769F9C180B4B104445"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_C87C628333414F09B5C3BB8D0789F9B7"
+        "MsmKey" = "8:_BB736A3E586941CAB51096F015EAF463"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -138,10 +138,10 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C87C628333414F09B5C3BB8D0789F9B7"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0AEABE33A73044769F9C180B4B104445"
             {
-            "SourcePath" = "8:..\\www.ico.la_2d76861fbe5f2d2d30e974a214b0b050_128X92.ico"
-            "TargetName" = "8:www.ico.la_2d76861fbe5f2d2d30e974a214b0b050_128X92.ico"
+            "SourcePath" = "8:..\\..\\Software-for-AFM\\Icon\\robot.ico"
+            "TargetName" = "8:robot.ico"
             "Tag" = "8:"
             "Folder" = "8:_CDBBCFDBBE184FCA9934BCACC9B354A7"
             "Condition" = "8:"
@@ -226,7 +226,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:NanoLab"
         "ProductCode" = "8:{BD8AE634-A6B7-4BB2-870A-2468ACF2361A}"
-        "PackageCode" = "8:{F8CDE142-27B4-45AC-A8E9-2B23C8EDB857}"
+        "PackageCode" = "8:{28762156-EC96-4561-93C0-7B0CC2177225}"
         "UpgradeCode" = "8:{614DA251-90D6-4B27-A800-A2BCB4CD7D33}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -357,7 +357,7 @@
             "Target" = "8:_D5D2E1C1CF0B4C8A8BAAFCF1FBB730C6"
             "Folder" = "8:_1D63F458294D4AA6B9E0F95348CD96E5"
             "WorkingFolder" = "8:_8773CA5912C44FCF9375AFA9D069AF18"
-            "Icon" = "8:_C87C628333414F09B5C3BB8D0789F9B7"
+            "Icon" = "8:_0AEABE33A73044769F9C180B4B104445"
             "Feature" = "8:"
             }
         }

@@ -71,6 +71,10 @@ namespace NanoExperiment.Cutting
                     sw.Close();
                     fs.Close();
                 }
+                str = sfd.FileName;
+                sw = new StreamWriter("SavePath.txt");
+                sw.WriteLine(str.Substring(0, str.LastIndexOf('\\')));
+                sw.Close();
             }
         }
     }
