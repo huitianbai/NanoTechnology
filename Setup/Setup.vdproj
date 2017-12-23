@@ -3,7 +3,7 @@
 "VSVersion" = "3:800"
 "ProjectType" = "8:{978C614F-708E-4E1A-B201-565925725DBA}"
 "IsWebType" = "8:FALSE"
-"ProjectName" = "8:NanoLab"
+"ProjectName" = "8:Automan"
 "LanguageId" = "3:2052"
 "CodePage" = "3:936"
 "UILanguageId" = "3:2052"
@@ -198,7 +198,7 @@
                 {
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_99ECC714C0DF407BB5DD1D9049F37D91"
                     {
-                    "Name" = "8:NanoLab"
+                    "Name" = "8:Automan"
                     "AlwaysCreate" = "11:FALSE"
                     "Condition" = "8:"
                     "Transitive" = "11:FALSE"
@@ -224,9 +224,9 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:NanoLab"
+        "ProductName" = "8:Automan"
         "ProductCode" = "8:{BD8AE634-A6B7-4BB2-870A-2468ACF2361A}"
-        "PackageCode" = "8:{28762156-EC96-4561-93C0-7B0CC2177225}"
+        "PackageCode" = "8:{7CCD8727-5C07-4E7A-A01E-83441F73E1CF}"
         "UpgradeCode" = "8:{614DA251-90D6-4B27-A800-A2BCB4CD7D33}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -237,7 +237,7 @@
         "Manufacturer" = "8:Default Company Name"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:NanoLabSetup"
+        "Title" = "8:AutomanSetup"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Default Company Name"
         "Keywords" = "8:"
@@ -348,7 +348,7 @@
         {
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_1604CF6C5F2D4DEB87C08EB7D1B7C08C"
             {
-            "Name" = "8:NanoLab"
+            "Name" = "8:Automan"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
